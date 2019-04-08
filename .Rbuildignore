@@ -1,0 +1,14 @@
+^codecov\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.git$
+^\.Rhistory
+LICENSE
+.travis.yml
+sbc.Rproj
+tutorial.Rmd
+tutorial.md
+test_data
+tutorial_files\*
+README.rst
+tutorial_files
