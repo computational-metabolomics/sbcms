@@ -6,6 +6,8 @@ NULL
 ##' @param x Values to convert.
 ##' @param a log offset.
 ##' @param inverse To apply log or reverse back to original values.
+##' 
+##' @return vector of log transformed values
 
 logFit <- function (x, a=1, inverse=FALSE) {
   if (inverse) {
@@ -28,7 +30,7 @@ logFit <- function (x, a=1, inverse=FALSE) {
 ##' @param spar Smoothing parameter of the fitted curve. Should be in the range
 ##'  0 to 1. If set to 0 it will be estimated using leave-one-out
 ##'  cross-validation.
-##' @export
+##' @return vector of cubic smoothing spline fitted values
 
 splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
   if(log == TRUE) {
@@ -58,14 +60,14 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
 ##' @param qcOrder QC measurement order.
 ##' @param spar Spline smoothing parameter. Should be in the range 0 to 1.
 ##' If set to 0 it will be estimated using leave-one-out cross-validation.
-##' @param log TRUE of FALSE to perform the signal correction fit on the
+##' @param log TRUE or FALSE to perform the signal correction fit on the
 ##'  log scaled data. Default is TRUE.
 ##' @param batch A vector indicating the batch each sample was measured in.
 ##' If only one batch was measured then all values should be set to 1.
 ##' @param minQC Minimum number of QC samples required for signal correction.
 ##' @param order A numeric vector indicating the order in which samples
 ##'  were measured.
-##' @export
+##' @return vector of corrected values of selected feature for QC data
 
 sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
   batch=batch, minQC) {
@@ -74,14 +76,14 @@ sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
     maxOrder <- length(order)
 
     cat (id,"\n")
-    newOrder <- 1:maxOrder
+    newOrder <- seq_len(maxOrder)
     subData <- qcData[id, ]
 
     nbatch <- unique(qcBatch)
 
     outl <- matrix(nrow=maxOrder, ncol=length(nbatch))
 
-    for (nb in 1:length(nbatch)) {
+    for (nb in seq_len(length(nbatch))) {
       x <- qcOrder[qcBatch == nbatch[nb]]
       y <- subData[qcBatch == nbatch[nb]]
       NAhits <- which(is.na(y))
@@ -100,7 +102,7 @@ sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
     }
 
     outp <- rep(NA, nrow(outl))
-    for (nb in 1:length(nbatch)) {
+    for (nb in seq_len(length(nbatch))) {
       range <- c(batch == nbatch[nb])
       outp[range] <- outl[range, nb]
     }

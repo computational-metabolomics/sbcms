@@ -8,18 +8,37 @@ plot_sbc(df, corrected_df, classes, batch, order,
   output = "sbcms_plots.pdf")
 }
 \arguments{
-\item{df}{A data frame containing the original data before correction (samples in columns, features in rows).}
+\item{df}{A data frame containing the original data before correction
+(samples in columns, features in rows).}
 
-\item{corrected_df}{A data frame containing the corrected data, as output by QCRSC}
+\item{corrected_df}{A data frame containing the corrected data,
+as output by QCRSC}
 
-\item{classes}{A factor or character vector of sample classes. All QC samples should be labelled "QC".}
+\item{classes}{A factor or character vector of sample classes.
+All QC samples should be labelled "QC".}
 
-\item{batch}{A vector indicating the batch each sample was measured in. If only one batch was measured then all values should be set to 1}
+\item{batch}{A vector indicating the batch each sample was measured in.
+If only one batch was measured then all values should be set to 1}
 
-\item{order}{A numeric vector  indicating the order in which samples were measured.}
+\item{order}{A numeric vector  indicating the order in which samples
+were measured.}
 
 \item{output}{Filename of the output pdf file. Can include the path.}
 }
+\value{
+Pdf file showing data before and after signal correction
+}
 \description{
 Plot the output from signal batch correction for the first 100 features
+}
+\examples{
+classes <- sbcdata$class
+batch <- sbcdata$batch
+order <- c(1:nrow(sbcdata$data))
+data <- t(sbcdata$data[, 1:20])
+out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
+ spar = 0, minQC = 4)
+plot_sbc (df = data, corrected_df = out, classes, batch, order,
+ output="sbcms_plots.pdf") 
+ 
 }

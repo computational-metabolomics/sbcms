@@ -13,11 +13,17 @@ splineSmoother(x, y, newX, log = log, a = 1, spar)
 
 \item{newX}{Range of sample indices to predict.}
 
-\item{log}{TRUE of FALSE to perform the signal correction fit on the log scaled data. Default is TRUE.}
+\item{log}{TRUE of FALSE to perform the signal correction fit on the log
+scaled data. Default is TRUE.}
 
 \item{a}{log scaling offset.}
 
-\item{spar}{Smoothing parameter of the fitted curve. Should be in the range 0 to 1. If set to 0 it will be estimated using leave-one-out cross-validation.}
+\item{spar}{Smoothing parameter of the fitted curve. Should be in the range
+0 to 1. If set to 0 it will be estimated using leave-one-out
+cross-validation.}
+}
+\value{
+vector of cubic smoothing spline fitted values
 }
 \description{
 Cubic smoothing spline fitting function for batch effect correction

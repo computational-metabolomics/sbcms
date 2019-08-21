@@ -13,6 +13,9 @@ logFit(x, a = 1, inverse = FALSE)
 
 \item{inverse}{To apply log or reverse back to original values.}
 }
+\value{
+vector of log transformed values
+}
 \description{
 Transform data using natural logarithm
 }

@@ -12,19 +12,26 @@ sbcWrapper(id, qcData, order, qcBatch, qcOrder, log = log, spar = spar,
 
 \item{qcData}{Data frame with QC samples.}
 
-\item{order}{A numeric vector indicating the order in which samples were measured.}
+\item{order}{A numeric vector indicating the order in which samples
+were measured.}
 
 \item{qcBatch}{QC batch numbers.}
 
 \item{qcOrder}{QC measurement order.}
 
-\item{log}{TRUE of FALSE to perform the signal correction fit on the log scaled data. Default is TRUE.}
+\item{log}{TRUE or FALSE to perform the signal correction fit on the
+log scaled data. Default is TRUE.}
 
-\item{spar}{Spline smoothing parameter. Should be in the range 0 to 1. If set to 0 it will be estimated using leave-one-out cross-validation.}
+\item{spar}{Spline smoothing parameter. Should be in the range 0 to 1.
+If set to 0 it will be estimated using leave-one-out cross-validation.}
 
-\item{batch}{A vector indicating the batch each sample was measured in. If only one batch was measured then all values should be set to 1.}
+\item{batch}{A vector indicating the batch each sample was measured in.
+If only one batch was measured then all values should be set to 1.}
 
 \item{minQC}{Minimum number of QC samples required for signal correction.}
+}
+\value{
+vector of corrected values of selected feature for QC data
 }
 \description{
 Signal batch correction wrapper function
