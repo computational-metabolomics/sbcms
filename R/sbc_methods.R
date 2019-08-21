@@ -1,14 +1,13 @@
 #' @importFrom stats smooth.spline predict
 NULL
 
-##' Glog fit
+##' Transform data using natural logarithm
 ##'
 ##' @param x Values to convert.
-##' @param a glog offset.
-##' @param inverse To apply glog or reverse back to original values.
-##' @export
+##' @param a log offset.
+##' @param inverse To apply log or reverse back to original values.
 
-glogFit <- function (x, a=1, inverse=FALSE) {
+logFit <- function (x, a=1, inverse=FALSE) {
   if (inverse) {
     out <- 0.25 * exp(-x) * (4 * exp(2 * x) - (a * a))
   }else{
@@ -23,14 +22,17 @@ glogFit <- function (x, a=1, inverse=FALSE) {
 ##' @param x QC sample measurement order indices.
 ##' @param y Signal intensities.
 ##' @param newX Range of sample indices to predict.
-##' @param log TRUE of FALSE to perform the signal correction fit on the log scaled data. Default is TRUE.
+##' @param log TRUE of FALSE to perform the signal correction fit on the log
+##'  scaled data. Default is TRUE.
 ##' @param a log scaling offset.
-##' @param spar Smoothing parameter of the fitted curve. Should be in the range 0 to 1. If set to 0 it will be estimated using leave-one-out cross-validation.
+##' @param spar Smoothing parameter of the fitted curve. Should be in the range
+##'  0 to 1. If set to 0 it will be estimated using leave-one-out
+##'  cross-validation.
 ##' @export
 
 splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
   if(log == TRUE) {
-    y <- glogFit(y, a=a)
+    y <- logFit(y, a=a)
   }
   if (spar == 0) {
     sp.obj <- smooth.spline(x, y, cv=TRUE)
@@ -41,7 +43,7 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
   valuePredict <- predict(sp.obj, newX)
 
   if(log==TRUE) {
-    valuePredict$y <- glogFit(valuePredict$y, a=a, inverse=TRUE)
+    valuePredict$y <- logFit(valuePredict$y, a=a, inverse=TRUE)
   }
 
   return(valuePredict$y)
@@ -54,16 +56,20 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
 ##' @param qcData Data frame with QC samples.
 ##' @param qcBatch QC batch numbers.
 ##' @param qcOrder QC measurement order.
-##' @param spar Spline smoothing parameter. Should be in the range 0 to 1. If set to 0 it will be estimated using leave-one-out cross-validation.
-##' @param log TRUE of FALSE to perform the signal correction fit on the log scaled data. Default is TRUE.
-##' @param batch A vector indicating the batch each sample was measured in. If only one batch was measured then all values should be set to 1.
+##' @param spar Spline smoothing parameter. Should be in the range 0 to 1.
+##' If set to 0 it will be estimated using leave-one-out cross-validation.
+##' @param log TRUE of FALSE to perform the signal correction fit on the
+##'  log scaled data. Default is TRUE.
+##' @param batch A vector indicating the batch each sample was measured in.
+##' If only one batch was measured then all values should be set to 1.
 ##' @param minQC Minimum number of QC samples required for signal correction.
-##' @param order A numeric vector indicating the order in which samples were measured.
+##' @param order A numeric vector indicating the order in which samples
+##'  were measured.
 ##' @export
 
-sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar, batch=batch, minQC) {
+sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
+  batch=batch, minQC) {
   out <- tryCatch ({
-
     # Measurment order can be non consecutive numbers as well
     maxOrder <- length(order)
 
@@ -86,7 +92,8 @@ sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar, 
       }
 
       if (length(y) >= minQC) {
-        outl[,nb] <- splineSmoother(x=x, y=y, newX=newOrder, log=log, a=1, spar=spar)
+        outl[,nb] <- splineSmoother(x=x, y=y, newX=newOrder, log=log,
+          a=1, spar=spar)
       } else {
         outl[,nb] <- rep(NA, maxOrder)
       }
