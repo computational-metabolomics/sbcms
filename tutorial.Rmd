@@ -86,7 +86,7 @@ To evaluate if the data needs correction, it is common practice to examine the  
 
 The following code calculates and plots the RSD% values of the features within the data set.
 
-```{r fig.height=6, fig.width=3, message=FALSE, warning=F}
+```{r fig.height=6, fig.width=3, message=FALSE, warning=FALSE}
 #  separate the LCMS data from the meta data
 data <- sbcdata$data[, seq(1, 2000, 100)]
 class <- sbcdata$class
@@ -97,7 +97,7 @@ order <- c(1:nrow(data))
 QChits <- which(class == "QC")
 
 # small function to calculate RSD%
-FUN <- function(x) sd(x, na.rm=T) / mean(x, na.rm=T) * 100
+FUN <- function(x) sd(x, na.rm=TRUE) / mean(x, na.rm=TRUE) * 100
 
 # RSD% of biological and QC samples within all 6 batches:
 out <- matrix(ncol=2, nrow=ncol(data))
@@ -116,7 +116,7 @@ plotdata <- melt(data.frame(out), variable.name="Class", value.name="RSD")
 plotdata$feature <- colnames(data)
 
 plotdata$RSD <- round(plotdata$RSD,0)
-plotdata$feature <- factor(plotdata$feature, ordered=T, levels=unique(plotdata$feature))
+plotdata$feature <- factor(plotdata$feature, ordered=TRUE, levels=unique(plotdata$feature))
 
 # plot
 ggplot(data=plotdata, aes(x=Class, y=feature, fill=RSD))+ 
@@ -212,7 +212,7 @@ dratio <- as.data.frame(round(dratio, 2))
 
 plotdata2 <- melt(dratio, variable.name="batch")
 plotdata2$index <- colnames(data)
-plotdata2$index <- factor(plotdata2$index, ordered=T, levels=unique(plotdata2$index))
+plotdata2$index <- factor(plotdata2$index, ordered=TRUE, levels=unique(plotdata2$index))
 
 qplot(x=index, y=value, color=batch, data=plotdata2, geom="point", xlab="index", ylab="D-ratio")+ 
   geom_hline(yintercept=1)+ theme(panel.background=element_blank())+
@@ -227,10 +227,10 @@ Principal components analysis (PCA) can be used to check common trends in data. 
 pca_data <- sbcdata$data[, seq(1, 2000, 100)]
 
 pca_data <- pmp::pqn_normalisation(pca_data, classes=class, qc_label="QC")[[1]]
-pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=0.5, colmax=0.5, maxp=NULL, check_df=F)
+pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=0.5, colmax=0.5, maxp=NULL, check_df=FALSE)
 pca_data <- pmp::glog_transformation(pca_data, classes=class, qc_label="QC")
 
-pca_data <- prcomp(t(pca_data), center=T, scale=F)
+pca_data <- prcomp(t(pca_data), center=TRUE, scale=FALSE)
 exp_var_pca <- round(((pca_data$sdev^2)/sum(pca_data$sdev^2)*100)[1:2], 2)
 
 plots <- list()
@@ -265,7 +265,7 @@ Alternatively, trends in measured signal related to measurement order could indi
 
 # autoscale the QC data
 QCdata <- data[QChits,]
-QCdata2 <- as.data.frame(scale(QCdata, scale=T, center=T))
+QCdata2 <- as.data.frame(scale(QCdata, scale=TRUE, center=TRUE))
 
 # prepare the data for plotting
 plotdata <- melt(QCdata2, value.name="intensity")
@@ -310,7 +310,7 @@ While most of the calculated *tau* values and corresponding *p-values* indicate 
 
 Alternatively it is possible to calculate correlation statistics per batch and visualise the results.
 
-```{r, warning=F, message=F}
+```{r, warning=FALSE, message=FALSE}
 
 correlations <- matrix(ncol=8, nrow=ncol(data))
 rownames(correlations) <- colnames(data)
@@ -320,7 +320,7 @@ QCbatch <- batch[QChits]
 
 for (coln in 1:ncol(data)) {
   for (bch in 1:8) {
-    sampleorder <- scale(c(1:length(which(QCbatch==bch))), center=T, scale=T)
+    sampleorder <- scale(c(1:length(which(QCbatch==bch))), center=TRUE, scale=TRUE)
     
     if ((length(sampleorder) - length(which(is.na(QCdata[which(QCbatch==bch), coln])))) >= 3){
       correlations[coln,bch] <- cor.test(sampleorder, QCdata[which(QCbatch==bch), coln], method="kendall")$estimate
@@ -336,14 +336,14 @@ plotdata <- as.data.frame(correlations)
 plotdata$feature <- rownames(plotdata)
 
 plotdata <- melt(plotdata, variable.name="batch")
-plotdata$feature <- factor(plotdata$feature, ordered=T, levels=unique(plotdata$feature))
+plotdata$feature <- factor(plotdata$feature, ordered=TRUE, levels=unique(plotdata$feature))
 
 ggplot(data=plotdata, aes(x=batch, y=feature, fill=value))+ 
   geom_tile()+ scale_fill_gradient2()
 
 ```
 
-Figure above indicates that there are significant acquisition order related trends within some batches. Fore example, bathes 4 and 6 for features '451.01081' and '409.05716'.
+Figure above indicates that there are significant acquisition order related trends within some batches. For example, bathes 4 and 6 for features '451.01081' and '409.05716'.
 
 ### Using univariate regression to estimate signal trends and variability within QC sample
 
@@ -399,7 +399,7 @@ plotdata <- as.data.frame(regPerBatch)
 plotdata$feature <- rownames(plotdata)
 
 plotdata <- melt(plotdata, variable.name="batch")
-plotdata$feature <- factor(plotdata$feature, ordered=T, levels=unique(plotdata$feature))
+plotdata$feature <- factor(plotdata$feature, ordered=TRUE, levels=unique(plotdata$feature))
 
 ggplot(data=plotdata, aes(x=batch, y=feature, fill=value))+ 
   geom_tile() + scale_fill_gradient2()
@@ -408,7 +408,7 @@ ggplot(data=plotdata, aes(x=batch, y=feature, fill=value))+
 ### Example of signal and batch correction for a single feature
 
 Let's have a closer look to '451.01086' measured feature and how signal correction can be applied.
-```{r, warning=F, message=F}
+```{r, warning=FALSE, message=FALSE}
 data <- data.frame(data=sbcdata$data$`451.01086`, batch=batch, class=factor(class, ordered=TRUE))
 data$order <- c(1:nrow(data))
 data$batch <- as.factor(data$batch)
@@ -433,7 +433,7 @@ ggplot(data=QCdata, aes(x=order, y=log(data,10), col=batch, shape=class))+ geom_
 This figure indicates that there is signal drift present within each analytical batch and between analytical batches for this feature. Let's have a look at the RSD% for all QC samples and QC samples within each analytical batch.
 
 ```{r}
-FUN <- function(x) sd(x, na.rm=T)/mean(x, na.rm=T) * 100
+FUN <- function(x) sd(x, na.rm=TRUE)/mean(x, na.rm=TRUE) * 100
 
 # RSD% of biological and QC samples within all 6 batches:
 out <- c(NA,NA)
@@ -541,7 +541,7 @@ The figure above shows the original data points in blue and the fitted data in r
 The next step in signal correction is to "flatten" the fitted curve to correct for signal drift. This can usually be done by subtracting the fitted values from the actual measured values for each feature. To avoid getting negative values we will add the median value of the feature to the corrected data.
 
 ```{r}
-fitmedian <- median(plotdata$measured, na.rm=T)
+fitmedian <- median(plotdata$measured, na.rm=TRUE)
 plotdata$corrected_subt <- (plotdata$measured - plotdata$fitted) + fitmedian
 
 plotdata2 <- melt(plotdata, id.vars=c("Class","order"), value.name="intensity", variable.name="data")
@@ -573,7 +573,7 @@ plotdata3$Class <- factor(plotdata_class)
 
 ggplot(data=plotdata3, aes(x=order, y=intensity, color=data, shape=Class))+ geom_point()+
   theme(panel.background=element_blank())+ scale_color_manual(values=manual_color)+
-  geom_smooth(se=F)+ facet_grid(Class ~ .)
+  geom_smooth(se=FALSE)+ facet_grid(Class ~ .)
 
 ```
 
@@ -626,7 +626,7 @@ After smoothed spline fit per each batch is calculated, we can apply signal corr
 mpa <- rep(NA, nrow(data))
 
 for (bch in 1:8) {
-  mpa[batch==bch] <- median(data$data[batch==bch], na.rm=T)
+  mpa[batch==bch] <- median(data$data[batch==bch], na.rm=TRUE)
 }
 
 
@@ -644,7 +644,7 @@ plotdata2 <- melt(plotdata, id.vars=c("batch","Class","order"), value.name="inte
 
 ggplot(data=plotdata2, aes(x=order, y=log(intensity,10), color=data, shape=Class)) + geom_point(alpha=0.2)+
   theme(panel.background=element_blank()) + scale_color_manual(values=manual_color) +
-  geom_smooth(se=F)+
+  geom_smooth(se=FALSE)+
   facet_grid(Class ~ .)
 
 
@@ -659,10 +659,10 @@ mpa <- rep(NA, nrow(data))
 
 for (bch in 1:8) {
   
-  mpa[batch == bch] <- median(res2[batch == bch], na.rm=T)
+  mpa[batch == bch] <- median(res2[batch == bch], na.rm=TRUE)
 }
 
-grandMedian <- median(res2, na.rm=T)
+grandMedian <- median(res2, na.rm=TRUE)
 
 mpa <- mpa - grandMedian
 
@@ -672,10 +672,10 @@ mpa <- rep(NA, nrow(data))
 
 for (bch in 1:8) {
   
-  mpa[batch == bch] <- median(res[batch == bch], na.rm=T)
+  mpa[batch == bch] <- median(res[batch == bch], na.rm=TRUE)
 }
 
-grandMedian <- median(res, na.rm=T)
+grandMedian <- median(res, na.rm=TRUE)
 
 mpa <- mpa - grandMedian
 
@@ -685,7 +685,7 @@ plotdata2 <- melt(plotdata, id.vars=c("batch","Class","order"), value.name="inte
 
 ggplot(data=plotdata2, aes(x=order, y=log(intensity,10), color=data, shape=Class)) + geom_point(alpha=0.2)+
   theme(panel.background=element_blank())+ scale_color_manual(values=manual_color)+
-  geom_smooth(se=F)+
+  geom_smooth(se=FALSE)+
   facet_grid(Class ~ .)
 
 ```
@@ -693,7 +693,7 @@ ggplot(data=plotdata2, aes(x=order, y=log(intensity,10), color=data, shape=Class
 We can calculate RSD% before and after correction.
 
 ```{r}
-FUN <- function(x) sd(x, na.rm=T)/mean(x, na.rm=T) * 100
+FUN <- function(x) sd(x, na.rm=TRUE)/mean(x, na.rm=TRUE) * 100
 
 # RSD% of biological and QC samples within all 6 batches:
 out <- matrix(nrow=2, ncol=2)
@@ -817,15 +817,15 @@ Or compare the scores plots of princiapl components analysis before and after co
 # https://dx.doi.org/10.1007/s11306-016-1030-9
 
 pca_data <- pmp::pqn_normalisation(data, classes=class, qc_label="QC")[[1]]
-pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=0.5, colmax=0.5, maxp=NULL, check_df=F)
+pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=0.5, colmax=0.5, maxp=NULL, check_df=FALSE)
 pca_data <- pmp::glog_transformation(pca_data, classes=class, qc_label="QC")
 
 pca_corrected_data <- pmp::pqn_normalisation(corrected_data, classes=class, qc_label="QC")[[1]]
-pca_corrected_data <- pmp::mv_imputation(pca_corrected_data, method="KNN", k=5, rowmax=0.5, colmax=0.5, maxp=NULL, check_df=F)
+pca_corrected_data <- pmp::mv_imputation(pca_corrected_data, method="KNN", k=5, rowmax=0.5, colmax=0.5, maxp=NULL, check_df=FALSE)
 pca_corrected_data <- pmp::glog_transformation(pca_corrected_data, classes=class, qc_label="QC")
 
-pca_data <- prcomp(t(pca_data), center=T, scale=F)
-pca_corrected_data <- prcomp(t(pca_corrected_data), center=T, scale=F)
+pca_data <- prcomp(t(pca_data), center=TRUE, scale=FALSE)
+pca_corrected_data <- prcomp(t(pca_corrected_data), center=TRUE, scale=FALSE)
 
 # Calculate percentage of explained variance of the first two PC's
 exp_var_pca <- round(((pca_data$sdev^2)/sum(pca_data$sdev^2)*100)[1:2],2)
