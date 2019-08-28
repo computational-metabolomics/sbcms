@@ -1,7 +1,7 @@
 language: r
 r: bioc-devel
 r_github_packages: 
-    - github::computational-metabolomics/pmp
+    - computational-metabolomics/pmp
 cache: 
   packages: true
 sudo: required
