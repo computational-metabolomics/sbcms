@@ -12,3 +12,5 @@ test_data
 tutorial_files\*
 README.rst
 tutorial_files
+html_docs\*
+html_docs
