@@ -113,12 +113,7 @@ sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
   error = function(e){
     print (e, "\n")
     return(NULL)
-  },
-
-  warning = function(e){
-    print (e, "\n")
-    return(NULL)
   })
-
+  
   return(outp)
 }
