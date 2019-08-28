@@ -7,7 +7,6 @@ Maintainer: Andris Jankevics <a.jankevics@bham.ac.uk>
 Description: This signal batch correction package for LC-MS data. This version supports missing vallues in your data (at least 4 data point for QC are needed) and has moduler desing to add different fitting/correction functions.
 Depends: R(>= 3.1.0)
 Imports: stats, grDevices, ggplot2, reshape2
-Remotes: github::computational-metabolomics/pmp
 License: GPL-3
 biocViews: MassSpectrometry, Metabolomics, Software
 Encoding: UTF-8
