@@ -1,8 +1,10 @@
 #' @import ggplot2
 #' @importFrom grDevices pdf dev.off
+#' @importFrom reshape2 melt
 NULL
 
-##' Plot the output from signal batch correction for the first 100 features
+##' Plot the output from signal batch correction for the selected or the first
+##'  100 features
 ##'
 ##' @param df A data frame containing the original data before correction
 ##'  (samples in columns, features in rows).
@@ -12,6 +14,8 @@ NULL
 ##'  If only one batch was measured then all values should be set to 1
 ##' @param classes A factor or character vector of sample classes.
 ##'  All QC samples should be labelled "QC".
+##' @param indexes Numeric vector defining whihc features from data frame to 
+##' plot. If set to NULL will plot the first 100.
 ##' @param output Filename of the output pdf file. Can include the path.
 ##'   If set to NULL output will list object containing plots.
 ##' 
@@ -29,7 +33,7 @@ NULL
 ##'  
 ##' @export
 
-sbcmsPlot <- function (df, corrected_df, classes, batch,
+sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
   output="sbcms_plots.pdf")
 {
   shapes <- rep(1,length(classes))
@@ -50,13 +54,16 @@ sbcmsPlot <- function (df, corrected_df, classes, batch,
   )
 
   plots <- list()
-
-  plotLim <- 100
-  if (nrow(df) < 100) plotLim <- nrow(df)
-
-  for (peakn in seq_len(plotLim)){
+  
+  if (is.null(indexes) & nrow(df) >= 100){
+    indexes <- seq_len(100)
+  } else if (nrow(df) < 100 & is.null(indexes)) {
+    indexes <- seq_len(nrow(df))
+  }
+  
+  for (peakn in indexes){
     cat (peakn, "\n")
-    A <- data.frame (x=c(seq_len(ncol(df))), original=log(df[peakn, ],10),
+    A <- data.frame(x=c(seq_len(ncol(df))), original=log(df[peakn, ],10),
                      fitted=log(corrected_df[peakn, ],10),
                      batch=as.factor(batch), shapes=shapes)
     A <- melt(A, id.vars=c("x","batch","shapes"))
@@ -70,6 +77,9 @@ sbcmsPlot <- function (df, corrected_df, classes, batch,
       xlab("injection order")+
       gg_THEME
   }
+  
+  # remove lists with NULL values
+  plots[sapply(plots, is.null)] <- NULL
   
   if (!is.null(output)){
     pdf (output)

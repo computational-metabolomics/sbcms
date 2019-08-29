@@ -2,9 +2,10 @@
 % Please edit documentation in R/sbcmsPlot.R
 \name{sbcmsPlot}
 \alias{sbcmsPlot}
-\title{Plot the output from signal batch correction for the first 100 features}
+\title{Plot the output from signal batch correction for the selected or the first
+ 100 features}
 \usage{
-sbcmsPlot(df, corrected_df, classes, batch, order,
+sbcmsPlot(df, corrected_df, classes, batch, indexes = NULL,
   output = "sbcms_plots.pdf")
 }
 \arguments{
@@ -20,8 +21,8 @@ All QC samples should be labelled "QC".}
 \item{batch}{A vector indicating the batch each sample was measured in.
 If only one batch was measured then all values should be set to 1}
 
-\item{order}{A numeric vector  indicating the order in which samples
-were measured.}
+\item{indexes}{Numeric vector defining whihc features from data frame to 
+plot. If set to NULL will plot the first 100.}
 
 \item{output}{Filename of the output pdf file. Can include the path.
 If set to NULL output will list object containing plots.}
@@ -31,12 +32,12 @@ Pdf file or list object showing data before and after
 signal correction
 }
 \description{
-Plot the output from signal batch correction for the first 100 features
+Plot the output from signal batch correction for the selected or the first
+ 100 features
 }
 \examples{
 classes <- sbcdata$class
 batch <- sbcdata$batch
-order <- c(1:nrow(sbcdata$data))
 data <- t(sbcdata$data[, 1:20])
 out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
  spar = 0, minQC = 4)
