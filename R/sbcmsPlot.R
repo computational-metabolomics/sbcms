@@ -62,7 +62,7 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
   }
   
   for (peakn in indexes){
-    cat (peakn, "\n")
+    cat (peakn, " ")
     A <- data.frame(x=c(seq_len(ncol(df))), original=log(df[peakn, ],10),
                      fitted=log(corrected_df[peakn, ],10),
                      batch=as.factor(batch), shapes=shapes)
@@ -79,7 +79,7 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
   }
   
   # remove lists with NULL values
-  plots[sapply(plots, is.null)] <- NULL
+  plots <- plots[lengths(plots) != 0]
   
   if (!is.null(output)){
     pdf (output)
