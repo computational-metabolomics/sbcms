@@ -11,7 +11,6 @@ NULL
 ##' The smoothing parameter (spar) can be optimised using leave-one-out cross
 ##'  validation to avoid overfitting.
 ##' 
-
 ##' @param df A data frame of values to be corrected (samples in columns and
 ##'  features in rows).
 ##' @param order A numeric vector indicating the order in which samples
@@ -45,36 +44,23 @@ QCRSC <- function(df, order, batch, classes, spar=0, log=TRUE, minQC=5) {
     stop()
   }
 
-  message("The number of NA and <=0 values in peaksData before QC-RSC: ",
+  message("The number of NA and <= 0 values in peaksData before QC-RSC: ",
     sum(is.na(df) | df <= 0))
 
   qcData <- df[, classes == "QC"]
-
-  cat("QC-RSC smoothing parameter= ", spar, "\n")
-
   qc_batch <- batch[classes == "QC"]
   qc_order <- order[classes == "QC"]
-
-  message(date(), "\t smooth fitting ...")
-
   QC_fit <- lapply (seq_len(nrow(df)), sbcWrapper, qcData=qcData, order=order,
     qcBatch=qc_batch, qcOrder=qc_order, log=log, spar=spar, batch=batch,
     minQC=minQC)
-
   QC_fit <- do.call (rbind, QC_fit)
-
-  message(date(), "\tsmooth fitting done.")
 
   ## Median value for each fature, and divide it by predicted value
   mpa <- apply(df, 1, median, na.rm=TRUE)
-
   QC_fit <- QC_fit/mpa
 
   ## Divide measured value by correction factor
   res <- df/QC_fit
-
   res[res <= 0] <- NA
-
   res
-
 }

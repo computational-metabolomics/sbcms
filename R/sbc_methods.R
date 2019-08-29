@@ -33,22 +33,25 @@ logFit <- function (x, a=1, inverse=FALSE) {
 ##' @return vector of cubic smoothing spline fitted values
 
 splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
-  if(log == TRUE) {
-    y <- logFit(y, a=a)
-  }
-  if (spar == 0) {
-    sp.obj <- smooth.spline(x, y, cv=TRUE)
-  } else {
-    sp.obj <- smooth.spline(x, y, spar=spar)
-  }
+  out <- tryCatch ({
+    if(log == TRUE) {
+      y <- logFit(y, a=a)
+    }
+    if (spar == 0) {
+      sp.obj <- smooth.spline(x, y, cv=TRUE)
+    } else {
+      sp.obj <- smooth.spline(x, y, spar=spar)
+    }
 
-  valuePredict <- predict(sp.obj, newX)
+    valuePredict <- predict(sp.obj, newX)
 
-  if(log==TRUE) {
-    valuePredict$y <- logFit(valuePredict$y, a=a, inverse=TRUE)
-  }
-
-  return(valuePredict$y)
+    if(log==TRUE) {
+      valuePredict$y <- logFit(valuePredict$y, a=a, inverse=TRUE)
+    }
+    return(valuePredict$y)
+  })
+  
+  return(out)
 }
 
 
@@ -75,7 +78,6 @@ sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
     # Measurment order can be non consecutive numbers as well
     maxOrder <- length(order)
 
-    cat (id,"\n")
     newOrder <- seq_len(maxOrder)
     subData <- qcData[id, ]
 
