@@ -16,8 +16,10 @@ NULL
 ##' @param order A numeric vector  indicating the order in which samples
 ##'  were measured.
 ##' @param output Filename of the output pdf file. Can include the path.
+##'   If set to NULL output will list object containing plots.
 ##' 
-##' @return Pdf file showing data before and after signal correction
+##' @return Pdf file or list object showing data before and after 
+##' signal correction
 ##' 
 ##' @examples 
 ##' classes <- sbcdata$class
@@ -26,8 +28,8 @@ NULL
 ##' data <- t(sbcdata$data[, 1:20])
 ##' out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
 ##'  spar = 0, minQC = 4)
-##' sbcmsPlot (df = data, corrected_df = out, classes, batch, order,
-##'  output="sbcms_plots.pdf") 
+##' plots <- sbcmsPlot (df = data, corrected_df = out, classes, batch, order,
+##'  output=NULL) 
 ##'  
 ##' @export
 
@@ -73,9 +75,12 @@ sbcmsPlot <- function (df, corrected_df, classes, batch, order,
       xlab("injection order")+
       gg_THEME
   }
-
-  pdf (output)
-  invisible(lapply(plots, print))
-  dev.off()
-
+  
+  if (!is.null(output)){
+    pdf (output)
+    invisible(lapply(plots, print))
+    dev.off()
+  } else {
+    return(plots)
+  }
 }
