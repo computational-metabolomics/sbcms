@@ -12,8 +12,6 @@ NULL
 ##'  If only one batch was measured then all values should be set to 1
 ##' @param classes A factor or character vector of sample classes.
 ##'  All QC samples should be labelled "QC".
-##' @param order A numeric vector  indicating the order in which samples
-##'  were measured.
 ##' @param output Filename of the output pdf file. Can include the path.
 ##'   If set to NULL output will list object containing plots.
 ##' 
@@ -23,7 +21,6 @@ NULL
 ##' @examples 
 ##' classes <- sbcdata$class
 ##' batch <- sbcdata$batch
-##' order <- c(1:nrow(sbcdata$data))
 ##' data <- t(sbcdata$data[, 1:20])
 ##' out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
 ##'  spar = 0, minQC = 4)
@@ -32,7 +29,7 @@ NULL
 ##'  
 ##' @export
 
-sbcmsPlot <- function (df, corrected_df, classes, batch, order,
+sbcmsPlot <- function (df, corrected_df, classes, batch,
   output="sbcms_plots.pdf")
 {
   shapes <- rep(1,length(classes))
