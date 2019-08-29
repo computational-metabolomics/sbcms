@@ -7,9 +7,9 @@ test_that ("sbcWrapper returns expected output", {
   order <- c(1:nrow(sbcdata$data))
 
   Data <- t(sbcdata$data)
-  qcData <- Data[,classes=="QC"]
-  qc_batch <- batch[classes=="QC"]
-  qc_order <- order[classes=="QC"]
+  qcData <- Data[,classes == "QC"]
+  qc_batch <- batch[classes == "QC"]
+  qc_order <- order[classes == "QC"]
 
   out <- sbcWrapper(id=4, qcData=qcData, order=order, qcOrder=qc_order, qcBatch=qc_batch,
                        log=TRUE, spar=0, batch=batch, minQC=4)
@@ -25,9 +25,9 @@ test_that ("sbcWrapper returns expected output, with predefined spar value", {
   order <- c(1:nrow(sbcdata$data))
   
   Data <- t(sbcdata$data)
-  qcData <- Data[,classes=="QC"]
-  qc_batch <- batch[classes=="QC"]
-  qc_order <- order[classes=="QC"]
+  qcData <- Data[,classes == "QC"]
+  qc_batch <- batch[classes == "QC"]
+  qc_order <- order[classes == "QC"]
   
   out <- sbcWrapper(id=4, qcData=qcData, order=order, qcOrder=qc_order, qcBatch=qc_batch,
                     log=TRUE, spar=1, batch=batch, minQC=4)
@@ -43,9 +43,9 @@ test_that ("sbcWrapper returns NA if not enough data point are measured", {
   order <- c(1:nrow(sbcdata$data))
   
   Data <- t(sbcdata$data)
-  qcData <- Data[,classes=="QC"]
-  qc_batch <- batch[classes=="QC"]
-  qc_order <- order[classes=="QC"]
+  qcData <- Data[,classes == "QC"]
+  qc_batch <- batch[classes == "QC"]
+  qc_order <- order[classes == "QC"]
   
   qcData[4, -c(sample(38, 3))] <- NA
   
@@ -62,9 +62,9 @@ test_that ("sbcWrapper returns error", {
   order <- c(1:nrow(sbcdata$data))
   
   Data <- t(sbcdata$data)
-  qcData <- Data[,classes=="QC"]
-  qc_batch <- batch[classes=="QC"]
-  qc_order <- order[classes=="QC"]
+  qcData <- Data[,classes == "QC"]
+  qc_batch <- batch[classes == "QC"]
+  qc_order <- order[classes == "QC"]
   
   dim(qcData) <- NULL
   
