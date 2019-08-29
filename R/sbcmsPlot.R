@@ -1,5 +1,4 @@
 #' @import ggplot2
-#' @import reshape2
 #' @importFrom grDevices pdf dev.off
 NULL
 
@@ -51,7 +50,6 @@ sbcmsPlot <- function (df, corrected_df, classes, batch, order,
     panel.grid.minor.x=element_line(color="gray80", size=0.3,
       linetype="dashed"),
     panel.grid.minor.y=element_line(color="gray80", size=0.3)
-
   )
 
   plots <- list()

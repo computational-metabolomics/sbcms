@@ -23,10 +23,12 @@ If only one batch was measured then all values should be set to 1}
 \item{order}{A numeric vector  indicating the order in which samples
 were measured.}
 
-\item{output}{Filename of the output pdf file. Can include the path.}
+\item{output}{Filename of the output pdf file. Can include the path.
+If set to NULL output will list object containing plots.}
 }
 \value{
-Pdf file showing data before and after signal correction
+Pdf file or list object showing data before and after 
+signal correction
 }
 \description{
 Plot the output from signal batch correction for the first 100 features
@@ -38,7 +40,7 @@ order <- c(1:nrow(sbcdata$data))
 data <- t(sbcdata$data[, 1:20])
 out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
  spar = 0, minQC = 4)
-sbcmsPlot (df = data, corrected_df = out, classes, batch, order,
- output="sbcms_plots.pdf") 
+plots <- sbcmsPlot (df = data, corrected_df = out, classes, batch, order,
+ output=NULL) 
  
 }
