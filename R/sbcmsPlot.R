@@ -26,12 +26,12 @@ NULL
 ##' data <- t(sbcdata$data[, 1:20])
 ##' out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
 ##'  spar = 0, minQC = 4)
-##' plot_sbc (df = data, corrected_df = out, classes, batch, order,
+##' sbcmsPlot (df = data, corrected_df = out, classes, batch, order,
 ##'  output="sbcms_plots.pdf") 
 ##'  
 ##' @export
 
-plot_sbc <- function (df, corrected_df, classes, batch, order,
+sbcmsPlot <- function (df, corrected_df, classes, batch, order,
   output="sbcms_plots.pdf")
 {
   shapes <- rep(1,length(classes))
