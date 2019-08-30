@@ -60,7 +60,7 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
   }
   for (peakn in indexes){
     A <- data.frame(x=c(seq_len(ncol(df))), original=log(df[peakn, ],10),
-                     fitted=log(corrected_df[peakn, ],10),
+                     corrected=log(corrected_df[peakn, ],10),
                      batch=as.factor(batch), shapes=shapes)
     A <- melt(A, id.vars=c("x","batch","shapes"))
 
