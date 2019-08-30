@@ -1,5 +1,5 @@
 ---
-title: "Signal and Batch Correction for Mass Spectrometry (sbcms), data assesment and correction"
+title: "Signal and Batch Correction, data assesment and correction"
 author: 
 - name: "Andris Jankevics"
   affiliation: Phenome Centre Birmingham, University of Birmingham
@@ -40,14 +40,17 @@ other resources you might find useful:
 
 [Reshaping Data](https://www.statmethods.net/management/reshape.html)
 
-[Creating graphics with ggplot2](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
+[Creating graphics with ggplot2](http://r-statistics.co/Complete-Ggplot2
+-Tutorial-Part1-With-R-Code.html)
 
-[ggplot2 practical guide](http://www.sthda.com/english/wiki/be-awesome-in-ggplot2-a-practical-guide
--to-be-highly-effective-r-software-and-data-visualization)
+[ggplot2 practical guide](http://www.sthda.com/english/wiki/be-awesome
+-in-ggplot2-a-practical-guide-to-be-highly-effective-r-software-and-data
+-visualization)
 
 [R cheat sheet](http://github.com/rstudio/cheatsheets/raw/master/base-r.pdf)
 
-[ggplot2 cheat sheet](cheatsheet https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+[ggplot2 cheat sheet](cheatsheet https://www.rstudio.com/wp-content/uploads/
+2015/03/ggplot2-cheatsheet.pdf)
 
 
 # Installation
@@ -977,8 +980,8 @@ ggplot(data=plotdata, aes(x=Class, y=RSD, fill=Class)) + geom_boxplot() +
 
 ```
 
-Or compare the scores plots of princiapl components analysis before and after
-correction.
+Or compare the scores plots of principal components analysis (PCA) before 
+and after correction.
 
 ```{r, fig.width=6, fig.height=8}
 # PQN used to normalise data

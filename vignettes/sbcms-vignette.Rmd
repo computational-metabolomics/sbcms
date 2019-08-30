@@ -1,0 +1,124 @@
+---
+title: "Signal and Batch Correction for Mass Spectrometry (sbcms)"
+author: 
+- name: "Andris Jankevics"
+  affiliation: Phenome Centre Birmingham, University of Birmingham
+  email: a.jankevics@bham.ac.uk
+package: sbcms
+date: "`r Sys.Date()`"
+output: 
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2  
+    number_sections: true  
+    toc_float: true
+
+vignette: >
+  %\VignetteIndexEntry{sbcms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+R package sbcms (Signal & Batch Correction for Mass Spectrometry) is an 
+implementation of Quality Control-Robust Spline Correction (QC-RSC)
+[Kirwan et al](<https://dx.doi.org/10.1007/s00216-013-6856-7>) algorithm 
+for signal drift and batch effect correction within/across a multi-batch direct
+infusion mass spectrometry (DIMS) and liquid chromatography mass spectrometry 
+(LCMS) datasets.
+
+# Installation
+
+You should have R version 3.4.1 or above and Rstudio installed to be able to
+run this notebook.
+
+Execute following commands from the R terminal.
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+install.packages("devtools")
+install.packages("ggplot2")
+install.packages("gridExtra")
+
+devtools::install_github("computational-metabolomics/pmp")
+devtools::install_github("computational-metabolomics/sbcms")
+```
+
+Load the required libraries into the R environment
+```{r message=FALSE, warning=FALSE}
+library(sbcms)
+library(ggplot2)
+library(reshape2)
+library(gridExtra)
+library(pmp)
+```
+
+# Data set
+
+We will be using a small subset of 20 features of an DIMS data set consisting 
+of 172 samples measured across 8 batches.
+More detailed description of the data set is available from 
+[Kirwan et al](https://www.nature.com/articles/sdata201412) and 
+[MTBLS79](https://www.ebi.ac.uk/metabolights/MTBLS79).
+
+```{r}
+# DIMS data set is included in 'sbcms' package.
+# (MTBLS79) [https://www.ebi.ac.uk/metabolights/MTBLS79]
+
+data <- sbcdata$data
+class <- sbcdata$class
+batch <- sbcdata$batch
+sample_order <- c(1:nrow(data))
+
+# Input data frame or matrix should have features in rows and samples in columns
+data <- t(data)
+
+# Input data structure
+data[1:5, 1:10]
+
+class[1:10]
+batch[1:10]
+sample_order[1:10]
+```
+
+# Applying signal and batch correction 
+
+Function QCRSC should be used to apply signal batch correction. 
+Input peak table should be in format where features are in rows and samples in 
+columns. 
+
+Argument 'order' should be numeric vector containing sample injection 
+order during analytical measurement and should be the same length as number of
+columns in peak table. 
+
+Argument `batch' should be numeric vector containing values of sample batch 
+number. If all samples were measured in 1 batch, then all values in the 'batch'
+vector should be '1'. 
+
+Values for 'classes' should be character vector containing sample class labels.
+Class label for quality control sample has to be "QC".
+
+```{r}
+corrected_data <- sbcms::QCRSC(df=data, order=sample_order, batch=batch, 
+  classes=class, spar=0, minQC=4)
+```
+
+# Visualising results
+
+Function 'sbcmsPlot' is providing visual comparison of data before and after 
+correction. Fore example we can check output for features '1', '5', and '30' in 
+peak matrix.
+```{r message=FALSE, warning=FALSE, fig.height=6, fig.width=6}
+plots <- sbcmsPlot (df=data, corrected_df=corrected_data, classes=class, 
+  batch=batch, output=NULL, indexes=c(1, 5, 30))
+plots
+```
+
