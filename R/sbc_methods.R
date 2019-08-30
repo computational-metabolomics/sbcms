@@ -33,7 +33,6 @@ logFit <- function (x, a=1, inverse=FALSE) {
 ##' @return vector of cubic smoothing spline fitted values
 
 splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
-  out <- tryCatch ({
     if(log == TRUE) {
       y <- logFit(y, a=a)
     }
@@ -49,9 +48,6 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
       valuePredict$y <- logFit(valuePredict$y, a=a, inverse=TRUE)
     }
     return(valuePredict$y)
-  })
-  
-  return(out)
 }
 
 

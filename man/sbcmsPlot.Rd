@@ -39,9 +39,10 @@ Plot the output from signal batch correction for the selected or the first
 classes <- sbcdata$class
 batch <- sbcdata$batch
 data <- t(sbcdata$data[, 1:20])
-out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
- spar = 0, minQC = 4)
-plots <- sbcmsPlot (df = data, corrected_df = out, classes, batch, order,
+order <- c(1:ncol(data))
+out <- QCRSC(d =data, order=order, batch=batch, classes=classes,
+ spar=0, minQC=4)
+plots <- sbcmsPlot (df=data, corrected_df=out, classes, batch,
  output=NULL) 
  
 }
