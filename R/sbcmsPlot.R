@@ -3,8 +3,8 @@
 #' @importFrom reshape2 melt
 NULL
 
-##' Plot the output from signal batch correction for the selected or the first
-##'  100 features
+##' Plot the output from signal batch correction for the selected or
+##'  the first 100 features
 ##'
 ##' @param df A data frame containing the original data before correction
 ##'  (samples in columns, features in rows).
@@ -39,10 +39,8 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
 {
   shapes <- rep(1,length(classes))
   shapes[classes == "QC"] <- 3
-
   manual_color <- c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3",
     "#a6cee3", "#778899", "#fb9a99", "#ffff33")
-
   gg_THEME <- theme(
     panel.background=element_blank(),
     panel.grid.major=element_line(color="gray80", size=0.3),
@@ -53,7 +51,6 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
       linetype="dashed"),
     panel.grid.minor.y=element_line(color="gray80", size=0.3)
   )
-
   plots <- list()
   
   if (is.null(indexes) & nrow(df) >= 100){
@@ -61,7 +58,6 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
   } else if (nrow(df) < 100 & is.null(indexes)) {
     indexes <- seq_len(nrow(df))
   }
-  
   for (peakn in indexes){
     A <- data.frame(x=c(seq_len(ncol(df))), original=log(df[peakn, ],10),
                      fitted=log(corrected_df[peakn, ],10),
@@ -77,7 +73,6 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes=NULL,
       xlab("injection order")+
       gg_THEME
   }
-  
   # remove lists with NULL values
   plots <- plots[lengths(plots) != 0]
   

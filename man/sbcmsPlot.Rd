@@ -2,8 +2,8 @@
 % Please edit documentation in R/sbcmsPlot.R
 \name{sbcmsPlot}
 \alias{sbcmsPlot}
-\title{Plot the output from signal batch correction for the selected or the first
- 100 features}
+\title{Plot the output from signal batch correction for the selected or
+ the first 100 features}
 \usage{
 sbcmsPlot(df, corrected_df, classes, batch, indexes = NULL,
   output = "sbcms_plots.pdf")
@@ -32,8 +32,8 @@ Pdf file or list object showing data before and after
 signal correction
 }
 \description{
-Plot the output from signal batch correction for the selected or the first
- 100 features
+Plot the output from signal batch correction for the selected or
+ the first 100 features
 }
 \examples{
 classes <- sbcdata$class
