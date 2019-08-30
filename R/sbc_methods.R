@@ -1,4 +1,5 @@
 #' @importFrom stats smooth.spline predict
+#' @importFrom utils capture.output
 NULL
 
 ##' Transform data using natural logarithm
@@ -18,27 +19,31 @@ logFit <- function (x, a=1, inverse=FALSE) {
   return(out)
 }
 
-
 ##' Cubic smoothing spline fitting function for batch effect correction
 ##'
 ##' @param x QC sample measurement order indices.
 ##' @param y Signal intensities.
 ##' @param newX Range of sample indices to predict.
-##' @param log TRUE of FALSE to perform the signal correction fit on the log
+##' @param log TRUE or FALSE to perform the signal correction fit on the log
 ##'  scaled data. Default is TRUE.
 ##' @param a log scaling offset.
 ##' @param spar Smoothing parameter of the fitted curve. Should be in the range
 ##'  0 to 1. If set to 0 it will be estimated using leave-one-out
 ##'  cross-validation.
+##' @param verbose If set to TRUE will return messages from smooth.spline 
+##' fit funtion
 ##' @return vector of cubic smoothing spline fitted values
 
-splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
+splineSmoother <- function(x, y, newX, log=log, a=1, spar, verbose=FALSE) {
     if(log == TRUE) {
       y <- logFit(y, a=a)
     }
     if (spar == 0) {
-      sp.obj <- smooth.spline(x, y, cv=TRUE)
+      # Supress spline fitting CV messages cluttering terminal output
+      smoothSplineMessages <- capture.output(sp.obj 
+        <- smooth.spline(x, y, cv=TRUE), file=NULL, type="message")
     } else {
+      smoothSplineMessages <- character()
       sp.obj <- smooth.spline(x, y, spar=spar)
     }
 
@@ -47,6 +52,11 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
     if(log==TRUE) {
       valuePredict$y <- logFit(valuePredict$y, a=a, inverse=TRUE)
     }
+    
+    if (verbose){
+      message(paste(smoothSplineMessages, collapse= " || "))
+    }
+    
     return(valuePredict$y)
 }
 
