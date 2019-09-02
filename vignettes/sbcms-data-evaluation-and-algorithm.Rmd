@@ -1,27 +1,30 @@
 ---
 title: "Signal and Batch Correction, data assesment and correction"
 author: 
-- name: "Andris Jankevics"
-  affiliation: Phenome Centre Birmingham, University of Birmingham
-  email: a.jankevics@bham.ac.uk
+    name: "Andris Jankevics"
+    affiliation: Phenome Centre Birmingham, University of Birmingham
+    email: a.jankevics@bham.ac.uk
 package: sbcms
 date: "`r Sys.Date()`"
 output: 
-  BiocStyle::html_document:
-    toc: true
-    toc_depth: 2  
-    number_sections: true  
-    toc_float: true
+    BiocStyle::html_document:
+        toc: true
+        toc_depth: 2  
+        number_sections: true  
+        toc_float: true
+
+bibliography: sbcms.bib
+
 vignette: >
-  %\VignetteIndexEntry{sbcms-algorithm}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteIndexEntry{sbcms-algorithm}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -40,18 +43,7 @@ other resources you might find useful:
 
 [Reshaping Data](https://www.statmethods.net/management/reshape.html)
 
-[Creating graphics with ggplot2](http://r-statistics.co/Complete-Ggplot2
--Tutorial-Part1-With-R-Code.html)
-
-[ggplot2 practical guide](http://www.sthda.com/english/wiki/be-awesome
--in-ggplot2-a-practical-guide-to-be-highly-effective-r-software-and-data
--visualization)
-
 [R cheat sheet](http://github.com/rstudio/cheatsheets/raw/master/base-r.pdf)
-
-[ggplot2 cheat sheet](cheatsheet https://www.rstudio.com/wp-content/uploads/
-2015/03/ggplot2-cheatsheet.pdf)
-
 
 # Installation
 
@@ -72,7 +64,7 @@ devtools::install_github("computational-metabolomics/sbcms")
 ```
 
 Load the required libraries into the R environment
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(sbcms)
 library(ggplot2)
 library(reshape2)
@@ -84,9 +76,8 @@ library(pmp)
 
 We will be using a small subset of 20 features of an DIMS data set consisting
 of 172 samples measured across 8 batches.
-More detailed description of the data set is available from 
-[Kirwan et al, Scientific Data, 1, 140012 (2014)]
-(https://www.nature.com/articles/sdata201412) and [MTBLS79](https://www.ebi.ac.uk/metabolights/MTBLS79)
+More detailed description of the data set is available from @kirwan2014
+[MTBLS79](https://www.ebi.ac.uk/metabolights/MTBLS79)
 
 ```{r}
 summary(sbcdata$data[, seq(1, 2000, 100)])
@@ -110,8 +101,7 @@ unique(sbcdata$class)
 # Explorative example
 
 A more detailed overview and guidelines on strategies for quality control of
-mass spectrometry assays is detailed in recent work by 
-[Broadhurst et al, Metabolomics, 14:72, 2018.](http://dx.doi.org/10.1007/s11306-018-1367-3)
+mass spectrometry assays is detailed in recent work by @broadhurst2018.
 
 To evaluate if the data needs correction, it is common practice to examine the
 relative standard deviation (RSD) of the quality control (QC) samples and
@@ -142,9 +132,8 @@ rownames(out) <- colnames(data)
 
 # for each feature calculate RSD% for the samples and the QCs
 for (i in 1:ncol(data)) {
-  
-  out[i, 1] <- FUN(data[-QChits, i]) # for samples
-  out[i, 2] <- FUN(data[QChits, i]) # for QCs
+    out[i, 1] <- FUN(data[-QChits, i]) # for samples
+    out[i, 2] <- FUN(data[QChits, i]) # for QCs
 }
 
 # prepare data for plotting
@@ -153,28 +142,29 @@ plotdata$feature <- colnames(data)
 
 plotdata$RSD <- round(plotdata$RSD,0)
 plotdata$feature <- factor(plotdata$feature, ordered=TRUE,
-  levels=unique(plotdata$feature))
+    levels=unique(plotdata$feature))
 
 # plot
 ggplot(data=plotdata, aes(x=Class, y=feature, fill=RSD)) + 
-  geom_tile() + 
-  geom_text(aes(label=RSD)) +
-  scale_fill_gradient2(low="black", mid="white", high="red")
+    geom_tile() + 
+    geom_text(aes(label=RSD)) +
+    scale_fill_gradient2(low="black", mid="white", high="red")
 ```
 
 A violin plot is a useful way of summarising the RSD% over all samples/QCs in
 the data set. Note a very high QC sample RSD% value for feature '409.05716'.
 ```{r, fig.width=6, fig.height=6}
 ggplot(data=plotdata, aes(x=Class, y=RSD, fill=Class)) +
-  geom_violin(draw_quantiles=c(0.25,0.5,0.75)) +
-  ylab("RSD%") + 
-  theme(panel.background=element_blank())
+    geom_violin(draw_quantiles=c(0.25,0.5,0.75)) +
+    ylab("RSD%") + 
+    theme(panel.background=element_blank())
 ```
 
 The plots indicates that there are some features with a QC RSD% lower than  30%,
 which is a commonly accepted threshold, but for some features QC RSD % exceeds
-30% and is similar to the signal variation of the biological samples. We can
-calculate similar statistics per batch and visualise the results with a box plot.
+30% and is similar to the signal variation of the biological samples. 
+We can calculate similar statistics per batch and visualise the results with
+a box plot.
 
 ```{r message=FALSE, warning=FALSE, fig.width=6, fig.height=6}
 # prepare some matrices to store the results
@@ -188,22 +178,22 @@ rownames(RSDsample) <- colnames(data)
 
 # for each feature
 for (i in 1:ncol(data)) {
-  # for each batch
-  for (nb in 1:8) {
-    # RSD% of QCs in this batch
-    RSDQC[i, nb] <- FUN(data[which(class == "QC" & batch == nb), i])
-    # RSD% of samples in this batch
-    RSDsample[i, nb] <- FUN(data[which(!class == "QC" & batch == nb), i])
-  }
+    # for each batch
+    for (nb in 1:8) {
+        # RSD% of QCs in this batch
+        RSDQC[i, nb] <- FUN(data[which(class == "QC" & batch == nb), i])
+        # RSD% of samples in this batch
+        RSDsample[i, nb] <- FUN(data[which(!class == "QC" & batch == nb), i])
+    }
 }
 
 # prepare results for plotting
 plotdataQC <- melt(as.data.frame(RSDQC), variable.name="batch",
-  value.name="RSD")
+    value.name="RSD")
 plotdataQC$Class <- "QC"
 
 plotdataBio <- melt(as.data.frame(RSDsample), variable.name="batch",
-  value.name="RSD")
+    value.name="RSD")
 plotdataBio$Class <- "Sample"
 
 plotdata <- rbind(plotdataQC, plotdataBio)
@@ -212,9 +202,9 @@ plotdata$Class <- as.factor(plotdata$Class)
 
 # plot
 ggplot(data=plotdata, aes(x=Class, y=RSD, fill=Class)) + geom_boxplot() +
-  facet_wrap(~ batch, ncol=3) +
-  ylab("RSD%") +
-  theme(panel.background=element_blank())
+    facet_wrap(~ batch, ncol=3) +
+    ylab("RSD%") +
+    theme(panel.background=element_blank())
 ```
 
 **Summary of RSD% of QC samples**
@@ -239,7 +229,7 @@ exceeds the biological variation within biological samples.
 
 # prepare a list of colours for plotting
 manual_color = c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3", 
-  "#a6cee3", "#778899", "#fb9a99", "#ffff33")
+    "#a6cee3", "#778899", "#fb9a99", "#ffff33")
 
 # Function to calculate median absolute deviation
 DRatfun <- function(samples, qcs) mad(qcs) / mad(samples)
@@ -251,10 +241,10 @@ rownames(dratio) <- colnames(data)
 
 # calculate dratio for each feature, per batch
 for (i in 1:nrow(dratio)){
-  for (nb in 1:8) {
-    dratio[i, nb] <- DRatfun(samples=data[which(!class == "QC" &
-     batch == nb), i], qcs=data[which(class == "QC" & batch == nb), i])
-  }
+    for (nb in 1:8) {
+        dratio[i, nb] <- DRatfun(samples=data[which(!class == "QC" &
+        batch == nb), i], qcs=data[which(class == "QC" & batch == nb), i])
+    }
 }
 
 # prepare data for plotting
@@ -263,14 +253,14 @@ dratio <- as.data.frame(round(dratio, 2))
 plotdata2 <- melt(dratio, variable.name="batch")
 plotdata2$index <- colnames(data)
 plotdata2$index <- factor(plotdata2$index, ordered=TRUE,
-  levels=unique(plotdata2$index))
+    levels=unique(plotdata2$index))
 
 ggplot(data=plotdata2, aes(x=index, y=value, color=batch)) +
-  geom_point(size=2) +
-  xlab("index") + ylab("D-ratio") +
-  geom_hline(yintercept=1) + theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  theme(axis.text.x=element_text(angle=90))
+    geom_point(size=2) +
+    xlab("index") + ylab("D-ratio") +
+    geom_hline(yintercept=1) + theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    theme(axis.text.x=element_text(angle=90))
 ```
 
 The D-ratio is a convenient measure to assess if technical variation in the QC
@@ -290,15 +280,14 @@ should be replaced using imputation, followed by data scaling. We will use PQN
 metod to normalise data, KNN for missing value imputation and finally glog
 scaling method using functions from 
 `r Githubpkg("computational-metabolomics/pmp")` R package. 
-A more detailed overview is detailed in
-[Di Guida et al, Metabolomics, 12:93, 2016.](https://dx.doi.org/10.1007/s11306-016-1030-9)
+A more detailed overview is detailed in @guida2016.
 
 ```{r, fig.width=6, fig.height=6}
 pca_data <- sbcdata$data[, seq(1, 2000, 100)]
 
 pca_data <- pmp::pqn_normalisation(pca_data, classes=class, qc_label="QC")[[1]]
 pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=0.5,
-  colmax=0.5, maxp=NULL, check_df=FALSE)
+    colmax=0.5, maxp=NULL, check_df=FALSE)
 pca_data <- pmp::glog_transformation(pca_data, classes=class, qc_label="QC")
 
 pca_data <- prcomp(t(pca_data), center=TRUE, scale=FALSE)
@@ -307,23 +296,23 @@ exp_var_pca <- round(((pca_data$sdev^2)/sum(pca_data$sdev^2)*100)[1:2], 2)
 plots <- list()
 
 plotdata <- data.frame(PC1=pca_data$x[, 1], PC2=pca_data$x[, 2],
-  batch=as.factor(batch), class=class)
+    batch=as.factor(batch), class=class)
 
 plots[[1]] <- ggplot(data=plotdata, aes(x=PC1, y=PC2, col=batch)) +
-  geom_point(size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  ggtitle("PCA scores, before correction") +
-  xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
-  ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
+    geom_point(size=2) +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    ggtitle("PCA scores, before correction") +
+    xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
+    ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
 
 plots[[2]] <- ggplot(data=plotdata, aes(x=PC1, y=PC2, col=class)) +
-  geom_point(size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  ggtitle("PCA scores plot, before correction") +
-  xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
-  ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
+    geom_point(size=2) +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    ggtitle("PCA scores plot, before correction") +
+    xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
+    ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
 
 grid.arrange(ncol=2, plots[[1]], plots[[2]])
 ```
@@ -355,10 +344,10 @@ plotdata$batch <- as.factor(batch[QChits])
 
 # plot
 ggplot(data=plotdata, aes(x=index, y=intensity, col=batch)) +
-  geom_point(size=2) +
-  facet_wrap(~ variable, ncol=4) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color)
+    geom_point(size=2) +
+    facet_wrap(~ variable, ncol=4) +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color)
 ```
 
 This figure indicates that there is some fluctuation in the measured signal
@@ -368,11 +357,11 @@ above including linear regression fit between measured data points.
 
 ```{r, warning=FALSE, fig.height=12, fig.width=6}
 ggplot(data=plotdata, aes(x=index, y=intensity, col=batch)) + 
-  geom_point(size=2) +
-  facet_wrap(~ variable, ncol=4) +
-  geom_smooth(method="lm", se=TRUE, colour="black") +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color)
+    geom_point(size=2) +
+    facet_wrap(~ variable, ncol=4) +
+    geom_smooth(method="lm", se=TRUE, colour="black") +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color)
 ```
 
 The plot above indicates that some trends can be observed. It is possible to
@@ -389,9 +378,9 @@ colnames(correlations) <- c("tau","p.value")
 correlations <- as.data.frame(correlations)
 
 for (coln in 1:ncol(data)) {
-  stat <- cor.test(sampleorder, QCdata[, coln], method="kendall")
-  correlations$tau[coln] <- stat$estimate
-  correlations$p.value[coln] <- stat$p.value
+    stat <- cor.test(sampleorder, QCdata[, coln], method="kendall")
+    correlations$tau[coln] <- stat$estimate
+    correlations$p.value[coln] <- stat$p.value
 }
 
 correlations
@@ -418,16 +407,16 @@ colnames(correlations) <- unique(batch)
 QCbatch <- batch[QChits]
 
 for (coln in 1:ncol(data)) {
-  for (bch in 1:8) {
-    sampleorder <- scale(c(1:length(which(QCbatch==bch))),
-      center=TRUE, scale=TRUE)
-    
-    if ((length(sampleorder) - length(which(is.na(QCdata[which(QCbatch==bch),
-        coln])))) >= 3){
-      correlations[coln,bch] <- cor.test(sampleorder,
-        QCdata[which(QCbatch==bch), coln], method="kendall")$estimate
+    for (bch in 1:8) {
+        sampleorder <- scale(c(1:length(which(QCbatch==bch))),
+        center=TRUE, scale=TRUE)
+
+        if ((length(sampleorder) - 
+        length(which(is.na(QCdata[which(QCbatch==bch), coln])))) >= 3){
+            correlations[coln,bch] <- cor.test(sampleorder,
+            QCdata[which(QCbatch==bch), coln], method="kendall")$estimate
+        }
     }
-  }
 }
 
 round(correlations, 2)
@@ -439,10 +428,10 @@ plotdata$feature <- rownames(plotdata)
 
 plotdata <- melt(plotdata, variable.name="batch")
 plotdata$feature <- factor(plotdata$feature, ordered=TRUE,
-  levels = unique(plotdata$feature))
+    levels = unique(plotdata$feature))
 
 ggplot(data=plotdata, aes(x=batch, y=feature, fill=value)) + 
-  geom_tile() + scale_fill_gradient2()
+    geom_tile() + scale_fill_gradient2()
 
 ```
 
@@ -450,7 +439,7 @@ Figure above indicates that there are significant acquisition order related
 trends within some batches. Fore example, bathes 4 and 6 for features
 '451.01081' and '409.05716'.
 
-## Using univariate regression to estimate signal trends and variability within QC sample
+## Using regression to estimate signal trends and variability within QC sample
 
 It is possible to apply univariate regression to the QC sample measurement
 order and signal intensity, to estimate correlation and spread (R2) of the
@@ -465,13 +454,13 @@ colnames(regressionout) <- c("R2.adj","coefficient","p.value")
 regressionout <- as.data.frame(regressionout)
 
 for (coln in 1:ncol(data)) {
-  tempdat <- data.frame(x=sampleorder, y=QCdata[,coln])
-  stat <- lm(x ~ y, data=tempdat)
-  stat <- summary(stat)
-  
-  regressionout$R2.adj[coln] <- stat$adj.r.squared  
-  regressionout$coefficient[coln] <- stat$coefficients[2,1]
-  regressionout$p.value[coln] <- stat$coefficients[2,4]
+    tempdat <- data.frame(x=sampleorder, y=QCdata[,coln])
+    stat <- lm(x ~ y, data=tempdat)
+    stat <- summary(stat)
+
+    regressionout$R2.adj[coln] <- stat$adj.r.squared  
+    regressionout$coefficient[coln] <- stat$coefficients[2,1]
+    regressionout$p.value[coln] <- stat$coefficients[2,4]
 }
 
 regressionout
@@ -487,15 +476,13 @@ colnames(regPerBatch) <- unique(batch)
 QCbatch <- batch[QChits]
 
 for (coln in 1:ncol(data)) {
-  for (bch in 1:8) {
-    sampleorder <- c(1:length(which(QCbatch==bch)))
-    
-    tempdat <- data.frame(x=sampleorder, y=QCdata[which(QCbatch==bch),coln])
-    stat <- lm(x ~ y, data=tempdat)
-    stat <- summary(stat)
-    
-    regPerBatch[coln,bch] <- stat$adj.r.squared
-  }
+    for (bch in 1:8) {
+        sampleorder <- c(1:length(which(QCbatch==bch)))
+        tempdat <- data.frame(x=sampleorder, y=QCdata[which(QCbatch==bch),coln])
+        stat <- lm(x ~ y, data=tempdat)
+        stat <- summary(stat)
+        regPerBatch[coln,bch] <- stat$adj.r.squared
+    }
 }
 
 round(regPerBatch,2)
@@ -507,10 +494,10 @@ plotdata$feature <- rownames(plotdata)
 
 plotdata <- melt(plotdata, variable.name="batch")
 plotdata$feature <- factor(plotdata$feature, ordered=TRUE, 
-  levels=unique(plotdata$feature))
+    levels=unique(plotdata$feature))
 
 ggplot(data=plotdata, aes(x=batch, y=feature, fill=value)) + 
-  geom_tile() + scale_fill_gradient2()
+    geom_tile() + scale_fill_gradient2()
 ```
 
 ## Example of signal and batch correction for a single feature
@@ -519,13 +506,13 @@ Let's have a closer look to '451.01086' measured feature and how signal
 correction can be applied.
 ```{r, warning=FALSE, message=FALSE, fig.width=6, fig.height=6}
 data <- data.frame(data=sbcdata$data$`451.01086`, batch=batch,
-  class=factor(class, ordered=TRUE))
+    class=factor(class, ordered=TRUE))
 data$order <- c(1:nrow(data))
 data$batch <- as.factor(data$batch)
 
 ggplot(data=data, aes(x=order, y=log(data,10), col=batch, shape=class)) +
-  geom_point(size=2) + theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color)
+    geom_point(size=2) + theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color)
 ```
 
 In this plot circles and squares represent biological samples and triangles are
@@ -539,9 +526,9 @@ Similar plot for QC samples only
 QCdata <- data[data$class == "QC",]
 
 ggplot(data=QCdata, aes(x=order, y=log(data,10), col=batch, shape=class)) +
-  geom_point(size=2) + theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color, drop=FALSE) +
-  scale_shape_manual(values=c(16, 17, 15), drop=FALSE)
+    geom_point(size=2) + theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color, drop=FALSE) +
+    scale_shape_manual(values=c(16, 17, 15), drop=FALSE)
 ```
 
 This figure indicates that there is signal drift present within each analytical
@@ -565,9 +552,8 @@ out <- matrix(ncol=8,nrow=2)
 colnames(out) <- c(1:8)
 rownames(out) <- c("Biological","QC")
 for (i in 1:8) {
-  
-  out[1, i] <- FUN(data$data[which(!class=="QC" & batch==i)])
-  out[2, i] <- FUN(data$data[which(class=="QC" & batch==i)])
+    out[1, i] <- FUN(data$data[which(!class=="QC" & batch==i)])
+    out[2, i] <- FUN(data$data[which(class=="QC" & batch==i)])
 }
 
 out
@@ -579,8 +565,7 @@ batches 1 to 5. For batch 3 QC variation exceeds that of the biological samples.
 
 # Signal/batch correction using smoothed spline fitting
 
-We will apply QC-RSC signal correction method as it is described in
-[Kirwan et al](<https://dx.doi.org/10.1007/s00216-013-6856-7>).
+We will apply QC-RSC signal correction method as it is described in @kirwan2013.
 
 The first step involves extracting QC sample data
 
@@ -621,9 +606,9 @@ to be removed. The smoothed spline regression input will look like this:
 ```{r}
 NAhits <- which(is.na(y))
 if (length(NAhits)>0) {
-  x <- x[-c(NAhits)]
-  y <- y[-c(NAhits)]
-  rbind(x,y)
+    x <- x[-c(NAhits)]
+    y <- y[-c(NAhits)]
+    rbind(x,y)
 }
 ```
 
@@ -657,15 +642,15 @@ plotchr <- as.numeric(data$class)
 valuePredict$y <- exp(valuePredict$y)
 
 plotdata <- data.frame(measured=data$data[batch==nb], fitted=valuePredict$y,
-  Class=class[batch==nb], order=order[batch==nb])
+    Class=class[batch==nb], order=order[batch==nb])
 plotdata2 <- melt(plotdata, id.vars=c("Class","order"), value.name="intensity",
-  variable.name="data")
+    variable.name="data")
 
 ggplot(data=plotdata2, aes(x=order, y=log(intensity,10), color=data,
-  shape=Class)) + geom_point(size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  scale_shape_manual(values=c(16, 17, 15), drop=FALSE)
+    shape=Class)) + geom_point(size=2) +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    scale_shape_manual(values=c(16, 17, 15), drop=FALSE)
 ```
 
 The figure above shows the original data points in blue and the fitted data in
@@ -681,7 +666,7 @@ fitmedian <- median(plotdata$measured, na.rm=TRUE)
 plotdata$corrected_subt <- (plotdata$measured - plotdata$fitted) + fitmedian
 
 plotdata2 <- melt(plotdata, id.vars=c("Class","order"), 
-  value.name="intensity", variable.name="data")
+    value.name="intensity", variable.name="data")
 
 plotdata_class <- as.character(plotdata2$Class)
 plotdata_class[plotdata_class == "S"] <- "Sample"
@@ -689,10 +674,10 @@ plotdata_class[plotdata_class == "C"] <- "Sample"
 plotdata2$Class <- factor(plotdata_class)
 
 ggplot(data=plotdata2, aes(x=order, y=intensity, color=data, shape=Class)) +
-  geom_point(size=2) + theme(panel.background=element_blank()) + 
-  scale_color_manual(values=manual_color) +
-  facet_grid(Class ~ .) +
-  scale_shape_manual(values=c(17, 16), drop=FALSE)
+    geom_point(size=2) + theme(panel.background=element_blank()) + 
+    scale_color_manual(values=manual_color) +
+    facet_grid(Class ~ .) +
+    scale_shape_manual(values=c(17, 16), drop=FALSE)
 ```
 
 An alternative to subtraction of the fitted values is to divide them by the
@@ -704,7 +689,8 @@ plotdata$corrected_div <- plotdata$measured/(plotdata$fitted/fitmedian)
 
 plotdata3 <- plotdata[,c("Class", "order", "corrected_subt", "corrected_div")]
 
-plotdata3 <- melt(plotdata3, id.vars=c("Class","order"), value.name="intensity", variable.name="data")
+plotdata3 <- melt(plotdata3, id.vars=c("Class","order"), 
+    value.name="intensity", variable.name="data")
 
 plotdata_class <- as.character(plotdata3$Class)
 plotdata_class[plotdata_class=="S"] <- "Sample"
@@ -712,9 +698,9 @@ plotdata_class[plotdata_class=="C"] <- "Sample"
 plotdata3$Class <- factor(plotdata_class)
 
 ggplot(data=plotdata3, aes(x=order, y=intensity, color=data, shape=Class)) +
-  geom_point(size=2) + theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  geom_smooth(se=FALSE) + facet_grid(Class ~ .)
+    geom_point(size=2) + theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    geom_smooth(se=FALSE) + facet_grid(Class ~ .)
 
 ```
 
@@ -726,42 +712,41 @@ batch. The code below will perform the same steps for each of the 8 batches.
 outl <- rep(NA, nrow(data))
 
 for (nb in 1:length(nbatch)){
-  # assigning sample injection order for a batch to 'x', and corresponding 
-  # intensities to 'y'
-  x <- qc_order[qc_batch == nbatch[nb]]
-  y <- qcData[qc_batch == nbatch[nb]]
-  
-  # remove measurements with missing values
-  NAhits <- which(is.na(y))
-  if (length(NAhits) > 0) {
-      x <- x[-c(NAhits)]
-      y <- y[-c(NAhits)]
-  }
-      
-  # require at least 4 data points for QC fit
-  if (length(y) >= 4) {
-    range <- c(batch == nbatch[nb])
-      
-    # Order is a vector of sample indices for the current batch
-    outl[range] <- sbcms:::splineSmoother(x=x, y=y, newX=order[range], 
-      log=TRUE, a=1, spar=0)
-  
-    # If less than 5 data points are present, return empty values   
-  } else {
-      range <- c(batch == nbatch[nb])
-      outl[range] <- rep(NA, nrow(data))[range]
-  }
+    # assigning sample injection order for a batch to 'x', and corresponding 
+    # intensities to 'y'
+    x <- qc_order[qc_batch == nbatch[nb]]
+    y <- qcData[qc_batch == nbatch[nb]]
+
+    # remove measurements with missing values
+    NAhits <- which(is.na(y))
+    if (length(NAhits) > 0) {
+        x <- x[-c(NAhits)]
+        y <- y[-c(NAhits)]
+    }
+
+    # require at least 4 data points for QC fit
+    if (length(y) >= 4) {
+        range <- c(batch == nbatch[nb])
+        # Order is a vector of sample indices for the current batch
+        outl[range] <- sbcms:::splineSmoother(x=x, y=y, newX=order[range], 
+        log=TRUE, a=1, spar=0)
+
+        # If less than 5 data points are present, return empty values   
+    } else {
+        range <- c(batch == nbatch[nb])
+        outl[range] <- rep(NA, nrow(data))[range]
+    }
 }
 
 plotdata <- data.frame(measured=data$data, fitted=outl, Class=class, 
-  batch=batch, order=c(1:nrow(data)))
+    batch=batch, order=c(1:nrow(data)))
 plotdata2 <- melt(plotdata, id.vars=c("batch","Class","order"),
-  value.name="intensity", variable.name="data")
+    value.name="intensity", variable.name="data")
 
 ggplot(data=plotdata2, aes(x=order, y=log(intensity,10), 
     color=data, shape=Class)) + geom_point(alpha=0.5, size=2) +
-  theme(panel.background=element_blank()) + 
-  scale_color_manual(values=manual_color)
+    theme(panel.background=element_blank()) + 
+    scale_color_manual(values=manual_color)
 
 ```
 
@@ -775,7 +760,7 @@ correction within each batch.
 mpa <- rep(NA, nrow(data))
 
 for (bch in 1:8) {
-  mpa[batch==bch] <- median(data$data[batch==bch], na.rm=TRUE)
+    mpa[batch==bch] <- median(data$data[batch==bch], na.rm=TRUE)
 }
 
 
@@ -788,18 +773,16 @@ res <- data$data/QC_fit
 res2 <- (data$data -outl) +mpa
 
 plotdata <- data.frame(measured=data$data, corrected_subt=res2, 
-  corrected_div=res, Class=class, batch=batch, order=c(1:nrow(data)))
+    corrected_div=res, Class=class, batch=batch, order=c(1:nrow(data)))
 plotdata2 <- melt(plotdata, id.vars=c("batch","Class","order"), 
-  value.name="intensity", variable.name="data")
+    value.name="intensity", variable.name="data")
 
 ggplot(data=plotdata2, aes(x=order, y=log(intensity,10), 
     color=data, shape=Class)) + geom_point(alpha=0.2, size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  geom_smooth(se=FALSE) +
-  facet_grid(Class ~ .)
-
-
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    geom_smooth(se=FALSE) +
+    facet_grid(Class ~ .)
 ```
 
 The figure above shows the measured data points in blue and the corrected values
@@ -815,8 +798,7 @@ samples in that batch, to remove the difference.
 mpa <- rep(NA, nrow(data))
 
 for (bch in 1:8) {
-  
-  mpa[batch == bch] <- median(res2[batch == bch], na.rm=TRUE)
+    mpa[batch == bch] <- median(res2[batch == bch], na.rm=TRUE)
 }
 
 grandMedian <- median(res2, na.rm=TRUE)
@@ -828,8 +810,7 @@ plotdata$corrected_subt <- plotdata$corrected_subt - mpa
 mpa <- rep(NA, nrow(data))
 
 for (bch in 1:8) {
-  
-  mpa[batch == bch] <- median(res[batch == bch], na.rm=TRUE)
+    mpa[batch == bch] <- median(res[batch == bch], na.rm=TRUE)
 }
 
 grandMedian <- median(res, na.rm=TRUE)
@@ -839,15 +820,14 @@ mpa <- mpa - grandMedian
 plotdata$corrected_div <- plotdata$corrected_div - mpa
 
 plotdata2 <- melt(plotdata, id.vars=c("batch","Class","order"),
-  value.name="intensity", variable.name="data")
+    value.name="intensity", variable.name="data")
 
 ggplot(data=plotdata2, aes(x=order, y=log(intensity,10),
     color=data, shape=Class)) + geom_point(alpha=0.2, size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  geom_smooth(se=FALSE) +
-  facet_grid(Class ~ .)
-
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    geom_smooth(se=FALSE) +
+    facet_grid(Class ~ .)
 ```
 
 We can calculate RSD% before and after correction.
@@ -871,10 +851,10 @@ out <- matrix(ncol=8,nrow=4)
 colnames(out) <- c(1:8)
 rownames(out) <- c("Biological","QC","Corrected biological","Corrected QC")
 for(i in 1:8) {
-  out[1, i] <- FUN(data$data[which(!class=="QC" & batch==i)])
-  out[2, i] <- FUN(data$data[which(class=="QC" & batch==i)])
-  out[3, i] <- FUN(res[which(!class=="QC" & batch==i)])
-  out[4, i] <- FUN(res[which(class=="QC" & batch==i)])
+    out[1, i] <- FUN(data$data[which(!class=="QC" & batch==i)])
+    out[2, i] <- FUN(data$data[which(class=="QC" & batch==i)])
+    out[3, i] <- FUN(res[which(!class=="QC" & batch==i)])
+    out[4, i] <- FUN(res[which(class=="QC" & batch==i)])
 }
 
 round(out, 2)
@@ -897,7 +877,7 @@ batch <- sbcdata$batch
 sample_order <- c(1:ncol(data))
 
 corrected_data <- sbcms::QCRSC(df=data, order=sample_order, batch=batch,
-  classes=class, spar=0, minQC=4)
+    classes=class, spar=0, minQC=4)
 
 # Transose both original data and corrected data back to samples in rows format
 data <- t(data)
@@ -925,36 +905,36 @@ rownames(RSDsample_corrected) <- colnames(data)
 
 # for each feature
 for (i in 1:ncol(data)) {
-  # for each batch
-  for (nb in 1:8) {
-    # RSD% of QCs in this batch
-    RSDQC[i, nb] <- FUN(data[which(class == "QC" & batch == nb), i])
-    # RSD% of samples in this batch
-    RSDsample[i, nb] <- FUN(data[which(!class == "QC" & batch == nb), i])
-    # RSD% of QCs in this batch after correction
-    RSDQC_corrected[i, nb] <- FUN(corrected_data[which(class == "QC"
-      & batch == nb), i])
-    # RSD% of samples in this batch after correction
-    RSDsample_corrected[i, nb] <- FUN(corrected_data[which(!class == "QC"
-      & batch == nb), i]) 
-  }
+    # for each batch
+    for (nb in 1:8) {
+        # RSD% of QCs in this batch
+        RSDQC[i, nb] <- FUN(data[which(class == "QC" & batch == nb), i])
+        # RSD% of samples in this batch
+        RSDsample[i, nb] <- FUN(data[which(!class == "QC" & batch == nb), i])
+        # RSD% of QCs in this batch after correction
+        RSDQC_corrected[i, nb] <- FUN(corrected_data[which(class == "QC"
+            & batch == nb), i])
+        # RSD% of samples in this batch after correction
+        RSDsample_corrected[i, nb] <- FUN(corrected_data[which(!class == "QC"
+            & batch == nb), i]) 
+    }
 }
 
 # prepare results for plotting
 plotdataQC <- melt(as.data.frame(RSDQC), variable.name="batch",
-  value.name="RSD")
+    value.name="RSD")
 plotdataQC$Class <- "QC"
 
 plotdataBio <- melt(as.data.frame(RSDsample), variable.name="batch",
-  value.name="RSD")
+    value.name="RSD")
 plotdataBio$Class <- "Sample"
 
 plotdataQC_corrected <- melt(as.data.frame(RSDQC_corrected),
-  variable.name="batch", value.name="RSD")
+    variable.name="batch", value.name="RSD")
 plotdataQC_corrected$Class <- "QC_corr"
 
 plotdataBio_corrected <- melt(as.data.frame(RSDsample_corrected),
-  variable.name="batch", value.name="RSD")
+    variable.name="batch", value.name="RSD")
 plotdataBio_corrected$Class <- "Sample_corr"
 
 plotdata <- rbind(plotdataQC, plotdataQC_corrected)
@@ -963,10 +943,10 @@ plotdata$Class <- as.factor(plotdata$Class)
 
 # plot
 ggplot(data=plotdata, aes(x=Class, y=RSD, fill=Class)) + geom_boxplot() +
-  facet_wrap(~ batch, ncol=3) +
-  ylab("RSD%") +
-  theme(panel.background=element_blank()) +
-  scale_y_continuous(limits=c(0, 50))
+    facet_wrap(~ batch, ncol=3) +
+    ylab("RSD%") +
+    theme(panel.background=element_blank()) +
+    scale_y_continuous(limits=c(0, 50))
 
 plotdata <- rbind(plotdataBio, plotdataBio_corrected)
 
@@ -974,9 +954,9 @@ plotdata$Class <- as.factor(plotdata$Class)
 
 # plot
 ggplot(data=plotdata, aes(x=Class, y=RSD, fill=Class)) + geom_boxplot() +
-  facet_wrap(~ batch, ncol=3) +
-  ylab("RSD%") +
-  theme(panel.background=element_blank())
+    facet_wrap(~ batch, ncol=3) +
+    ylab("RSD%") +
+    theme(panel.background=element_blank())
 
 ```
 
@@ -993,15 +973,15 @@ and after correction.
 
 pca_data <- pmp::pqn_normalisation(data, classes=class, qc_label="QC")[[1]]
 pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=0.5,
-  colmax=0.5, maxp=NULL, check_df=FALSE)
+    colmax=0.5, maxp=NULL, check_df=FALSE)
 pca_data <- pmp::glog_transformation(pca_data, classes=class, qc_label="QC")
 
 pca_corrected_data <- pmp::pqn_normalisation(corrected_data, classes=class,
-  qc_label="QC")[[1]]
+    qc_label="QC")[[1]]
 pca_corrected_data <- pmp::mv_imputation(pca_corrected_data, method="KNN", k=5,
-  rowmax=0.5, colmax=0.5, maxp=NULL, check_df=FALSE)
+    rowmax=0.5, colmax=0.5, maxp=NULL, check_df=FALSE)
 pca_corrected_data <- pmp::glog_transformation(pca_corrected_data, 
-  classes=class, qc_label="QC")
+    classes=class, qc_label="QC")
 
 pca_data <- prcomp(t(pca_data), center=TRUE, scale=FALSE)
 pca_corrected_data <- prcomp(t(pca_corrected_data), center=TRUE, scale=FALSE)
@@ -1009,44 +989,48 @@ pca_corrected_data <- prcomp(t(pca_corrected_data), center=TRUE, scale=FALSE)
 # Calculate percentage of explained variance of the first two PC's
 exp_var_pca <- round(((pca_data$sdev^2)/sum(pca_data$sdev^2)*100)[1:2],2)
 exp_var_pca_corrected <- round(((pca_corrected_data$sdev^2) /
-  sum(pca_corrected_data$sdev^2)*100)[1:2],2)
+    sum(pca_corrected_data$sdev^2)*100)[1:2],2)
 
 plots <- list()
 
 plotdata <- data.frame(PC1=pca_data$x[, 1], PC2=pca_data$x[, 2], 
-  batch=as.factor(batch), class=class)
+    batch=as.factor(batch), class=class)
 
 plots[[1]] <- ggplot(data=plotdata, aes(x=PC1, y=PC2, col=batch)) +
-  geom_point(size=2) + theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  ggtitle("PCA scores, before correction") +
-  xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
-  ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
+    geom_point(size=2) + theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    ggtitle("PCA scores, before correction") +
+    xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
+    ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
 
 plots[[2]] <- ggplot(data=plotdata, aes(x=PC1, y=PC2, col=class)) +
-  geom_point(size=2) + theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  ggtitle("PCA scores, before correction") +
-  xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
-  ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
+    geom_point(size=2) + theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    ggtitle("PCA scores, before correction") +
+    xlab(paste0("PC1 (", exp_var_pca[1] ," %)")) +
+    ylab(paste0("PC2 (", exp_var_pca[2] ," %)"))
 
 plotdata_corr <- data.frame(PC1=pca_corrected_data$x[, 1], 
-  PC2=pca_corrected_data$x[, 2], batch=as.factor(batch), class=class)
+    PC2=pca_corrected_data$x[, 2], batch=as.factor(batch), class=class)
 
 plots[[3]] <- ggplot(data=plotdata_corr, aes(x=PC1, y=PC2, col=batch)) +
-  geom_point(size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  ggtitle("PCA scores, after correction") +
-  xlab(paste0("PC1 (", exp_var_pca_corrected[1] ," %)")) +
-  ylab(paste0("PC2 (", exp_var_pca_corrected[2] ," %)"))
+    geom_point(size=2) +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    ggtitle("PCA scores, after correction") +
+    xlab(paste0("PC1 (", exp_var_pca_corrected[1] ," %)")) +
+    ylab(paste0("PC2 (", exp_var_pca_corrected[2] ," %)"))
 
 plots[[4]] <- ggplot(data=plotdata_corr, aes(x=PC1, y=PC2, col=class)) +
-  geom_point(size=2) +
-  theme(panel.background=element_blank()) +
-  scale_color_manual(values=manual_color) +
-  ggtitle("PCA scores, after correction") +
-  xlab(paste0("PC1 (", exp_var_pca_corrected[1] ," %)")) +
-  ylab(paste0("PC2 (", exp_var_pca_corrected[2] ," %)"))
+    geom_point(size=2) +
+    theme(panel.background=element_blank()) +
+    scale_color_manual(values=manual_color) +
+    ggtitle("PCA scores, after correction") +
+    xlab(paste0("PC1 (", exp_var_pca_corrected[1] ," %)")) +
+    ylab(paste0("PC2 (", exp_var_pca_corrected[2] ," %)"))
 
 grid.arrange(ncol=2, plots[[1]], plots[[2]], plots[[3]], plots[[4]])
+```
+
+# References
+

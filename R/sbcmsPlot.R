@@ -37,7 +37,7 @@ NULL
 sbcmsPlot <- function(df, corrected_df, classes, batch, indexes = NULL,
     output = "sbcms_plots.pdf") {
     
-    shapes <- rep(1, length(classes))
+    shapes <- rep(19, length(classes))
     shapes[classes == "QC"] <- 3
     manual_color <- c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3", 
         "#a6cee3", "#778899", "#fb9a99", "#ffff33")
@@ -66,7 +66,7 @@ sbcmsPlot <- function(df, corrected_df, classes, batch, indexes = NULL,
         plots[[peakn]] <- ggplot(A, 
             aes_(~x, ~value, col = ~batch, shape = ~shapes)) + 
             facet_grid(variable ~ .) + geom_point() + 
-            scale_shape_identity() +
+            scale_shape_identity() + geom_point(size=2) +
             scale_colour_manual(values = manual_color) + 
             ggtitle(row.names(df)[peakn]) + ylab("log10(intensity)") + 
             xlab("injection order") + gg_THEME
