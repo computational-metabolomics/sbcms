@@ -17,7 +17,7 @@ were measured.}
 If only one batch then all values should be set to 1.}
 
 \item{classes}{A factor or character vector of sample classes. All QC
-samples should be labelled  "QC".}
+samples should be labelled  'QC'.}
 
 \item{spar}{Spline smoothing parameter. Should be in the range 0 to 1.
 If set to 0 it will be estimated using leave-one-out cross-validation.}
@@ -32,11 +32,11 @@ A data frame of corrected values.
 }
 \description{
 Implementation of signal correction algorithm as described
- in Kirwan et al, Anal. Bioanal. Chem., 405 (15), 2013
+in Kirwan et al, Anal. Bioanal. Chem., 405 (15), 2013
 }
 \details{
 The smoothing parameter (spar) can be optimised using leave-one-out cross
- validation to avoid overfitting.
+validation to avoid overfitting.
 }
 \examples{
 classes <- sbcdata$class
@@ -44,12 +44,12 @@ batch <- sbcdata$batch
 order <- c(1:nrow(sbcdata$data))
 data <- t(sbcdata$data[, 1:20])
 out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
- spar = 0, minQC = 4)
+spar = 0, minQC = 4)
 
 }
 \references{
 Kirwan et al, Anal. Bioanal. Chem., 405 (15), 2013
- \url{https://dx.doi.org/10.1007/s00216-013-6856-7}
+\url{https://dx.doi.org/10.1007/s00216-013-6856-7}
 }
 \author{
 Andris Jankevics \email{a.jankevics@bham.ac.uk}

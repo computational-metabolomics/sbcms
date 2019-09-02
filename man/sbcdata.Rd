@@ -13,10 +13,10 @@ sbcdata
 }
 \description{
 Data set of 20 biological samples that were analysed repeatedly,
- in 8 batches across 7 days.
+in 8 batches across 7 days.
 }
 \references{
 Kirwan et al, Scientific Data volume 1,
- Article number: 140012 (2014) https://www.nature.com/articles/sdata201412
+Article number: 140012 (2014) https://www.nature.com/articles/sdata201412
 }
 \keyword{datasets}
