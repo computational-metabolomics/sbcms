@@ -2,7 +2,7 @@
 SBCMS: Signal and Batch Correction for Mass Spectrometry
 ========================================================
 
-|Git| |Bioconda| |Build Status (Travis)| |License| |Coverage|
+|Git| |Bioconda| |Build Status (Travis)| |License| |Coverage| |mybinder|
 
 .. contents::
   :local:
@@ -158,3 +158,6 @@ References
 
 .. |Coverage| image:: https://codecov.io/gh/computational-metabolomics/sbcms/branch/master/graph/badge.svg
    :target: https://codecov.io/github/computational-metabolomics/sbcms?branch=master
+
+.. |mybinder| image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/computational-metabolomics/sbcms/master?filepath=notebooks

@@ -14,3 +14,5 @@ README.rst
 tutorial_files
 html_docs\*
 html_docs
+^binder/
+^notebooks/

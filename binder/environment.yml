@@ -1,0 +1,8 @@
+name: bioconductor-sbcms
+channels:
+  - conda-forge
+  - bioconda
+  - computational-metabolomics
+dependencies:
+  - bioconductor-pmp
+  - bioconductor-sbcms
