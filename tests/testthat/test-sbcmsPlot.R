@@ -51,3 +51,23 @@ test_that ("sbcmsPlot returns output for the first 100 features if
   
   testthat::expect_true(length(plots) == 100)
 })
+
+test_that ("sbcmsPlot returns ggplot output, with different QC sample label", {
+  
+  classes <- sbcdata$class
+  classes[classes == "QC"] <- "Quality"
+  batch <- sbcdata$batch
+  order <- c(1:nrow(sbcdata$data))
+  data <- t(sbcdata$data[, 1:10])
+  
+  out <- QCRSC(df = data, order = order, batch = batch, classes = classes,
+    spar = 0, minQC = 4, qc_label="Quality")
+  
+  plots <- sbcmsPlot(df = data, corrected_df = out, 
+    classes, batch, output=NULL, indexes=c(1,5,7), qc_label="Quality")
+  
+  testthat::expect_s3_class(plots[[1]], "ggplot")
+  # Empty plots are getting removed from the list object
+  testthat::expect_true(length(plots) == 3)
+  
+})

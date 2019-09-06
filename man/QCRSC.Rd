@@ -4,7 +4,8 @@
 \alias{QCRSC}
 \title{Quality Control-Robust Spline Correction (QC-RSC)}
 \usage{
-QCRSC(df, order, batch, classes, spar = 0, log = TRUE, minQC = 5)
+QCRSC(df, order, batch, classes, spar = 0, log = TRUE, minQC = 5,
+  qc_label = "QC")
 }
 \arguments{
 \item{df}{A data frame of values to be corrected (samples in columns and
@@ -26,6 +27,8 @@ If set to 0 it will be estimated using leave-one-out cross-validation.}
 scaled data. Default is TRUE.}
 
 \item{minQC}{Minimum number of QC samples required for signal correction.}
+
+\item{qc_label}{Class label for QC sample.}
 }
 \value{
 A data frame of corrected values.

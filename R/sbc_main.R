@@ -24,6 +24,7 @@ NULL
 ##' @param log TRUE or FALSE to perform the signal correction fit on the log
 ##'scaled data. Default is TRUE.
 ##' @param minQC Minimum number of QC samples required for signal correction.
+##' @param qc_label Class label for QC sample.
 ##'
 ##' @return A data frame of corrected values.
 ##'
@@ -37,19 +38,21 @@ NULL
 ##' 
 ##' @export
 
-QCRSC <- function(df, order, batch, classes, spar = 0, log = TRUE, minQC = 5) {
+QCRSC <- function(df, order, batch, classes, spar = 0, log = TRUE,
+    minQC = 5, qc_label="QC") {
     
-    if (length(which(classes == "QC")) <= 0) {
-        message("QC samples are not defined! Class label has to be QC.")
+    if (length(which(classes == qc_label)) <= 0) {
+        message("QC samples are not defined! Please see help page for
+            parameter qc_label.")
         stop()
     }
     
     message("The number of NA and <= 0 values in peaksData before QC-RSC: ",
         sum(is.na(df) | df <= 0))
     
-    qcData <- df[, classes == "QC"]
-    qc_batch <- batch[classes == "QC"]
-    qc_order <- order[classes == "QC"]
+    qcData <- df[, classes == qc_label]
+    qc_batch <- batch[classes == qc_label]
+    qc_order <- order[classes == qc_label]
     QC_fit <- lapply(seq_len(nrow(df)), sbcWrapper, qcData = qcData, 
         order = order, qcBatch = qc_batch, qcOrder = qc_order, 
         log = log, spar = spar, batch = batch, minQC = minQC)

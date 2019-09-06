@@ -6,7 +6,7 @@
 the first 100 features}
 \usage{
 sbcmsPlot(df, corrected_df, classes, batch, indexes = NULL,
-  output = "sbcms_plots.pdf")
+  qc_label = "QC", output = "sbcms_plots.pdf")
 }
 \arguments{
 \item{df}{A data frame containing the original data before correction
@@ -23,6 +23,8 @@ If only one batch was measured then all values should be set to 1}
 
 \item{indexes}{Numeric vector defining whihc features from data frame to 
 plot. If set to NULL will plot the first 100.}
+
+\item{qc_label}{Class label for QC sample.}
 
 \item{output}{Filename of the output pdf file. Can include the path.
 If set to NULL output will be list object containing ggplot2 plots.}

@@ -18,6 +18,7 @@ NULL
 ##'plot. If set to NULL will plot the first 100.
 ##' @param output Filename of the output pdf file. Can include the path.
 ##'If set to NULL output will be list object containing ggplot2 plots.
+##' @param qc_label Class label for QC sample.
 ##' 
 ##' @return Pdf file or list object showing data before and after 
 ##'signal correction
@@ -35,10 +36,10 @@ NULL
 ##' @export
 
 sbcmsPlot <- function(df, corrected_df, classes, batch, indexes = NULL,
-    output = "sbcms_plots.pdf") {
+    qc_label="QC", output = "sbcms_plots.pdf") {
     
     shapes <- rep(19, length(classes))
-    shapes[classes == "QC"] <- 3
+    shapes[classes == qc_label] <- 3
     manual_color <- c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3", 
         "#a6cee3", "#778899", "#fb9a99", "#ffff33")
     gg_THEME <- theme(panel.background = element_blank(), 
