@@ -20,9 +20,9 @@ Github
   install.packages("ggplot2")
   install.packages("gridExtra")
   install.packages("reshape2")
- 
+
   devtools::install_github("computational-metabolomics/pmp", build_vignettes=TRUE)
-  devtools::install_github('computational-metabolomics/sbcms', 
+  devtools::install_github('computational-metabolomics/sbcms',
     build_vignettes=TRUE)
 
 Conda
@@ -30,7 +30,7 @@ Conda
 
 .. code-block:: command
 
-   conda create -n sbcms bioconductor-sbcms -c conda-forge -c bioconda 
+   conda create -n sbcms bioconductor-sbcms -c conda-forge -c bioconda
     -c computational-metabolomics
   source activate sbcms
 
@@ -39,14 +39,14 @@ Conda
 Example
 ------------
 
-.. image:: tutorial_files/pca_scores.png
+.. image:: html_docs/pca_scores.png
   :width: 300
 
 .. code-block:: r
 
   library(sbcms)
   library(pmp)
-  
+
   # DIMS data set is included in 'sbcms' package
   # (MTBLS79) [https://www.ebi.ac.uk/metabolights/MTBLS79]
   data <- sbcdata$data
@@ -57,7 +57,7 @@ Example
   # Input data frame or matrix should have features in rows and samples in columns
   data <- t(data)
 
-  corrected_data <- sbcms::QCRSC(df=data, order=sample_order, batch=batch, 
+  corrected_data <- sbcms::QCRSC(df=data, order=sample_order, batch=batch,
     classes=class, spar=0, minQC=4)
 
   # Create PDF file comparing data before and after correction fo the first 100 features
@@ -68,16 +68,16 @@ Example
 
   library(ggplot2)
   library(gridExtra)
-  
-  manual_color=c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3", 
+
+  manual_color=c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3",
     "#a6cee3", "#778899", "#fb9a99", "#ffff33")
-  
+
   # PQN used to normalise data
   # KNN for missing value imputation
   # glog scaling
   # A more detailed overview is detailed in Di Guida et al, Metabolomics, 12:93, 2016
   # https://dx.doi.org/10.1007/s11306-016-1030-9
-  
+
   pca_data <- pmp::pqn_normalisation(data, classes=class, qc_label="QC")[[1]]
   pca_data <- pmp::mv_imputation(pca_data, method="KNN", k=5, rowmax=5, colmax=5, check_df=F)
   pca_data <- pmp::glog_transformation(pca_data, classes=class, qc_label="QC")
@@ -88,7 +88,7 @@ Example
 
   pca_data <- prcomp(t(pca_data), center=T, scale=F)
   pca_corrected_data <- prcomp(t(pca_corrected_data), center=T, scale=F)
-  
+
   exp_var_pca <- round(((pca_data$sdev^2)/sum(pca_data$sdev^2)*100)[1:2],2)
   exp_var_pca_corrected <- round(((pca_corrected_data$sdev^2)/sum(pca_corrected_data$sdev^2)*100)[1:2],2)
 
@@ -134,11 +134,12 @@ Example
 Tutorials
 ------------
 
-For step by step tutorial on how to assess and/or correct signal drift and batch 
+For step by step tutorial on how to assess and/or correct signal drift and batch
 effects within/across a multi-batch liquid chromatography mass
 spectrometry (LCMS) dataset using SBCMS please check R package vignettes.
 
 .. code-block:: r
+
   browseVignettes("sbcms")
 
 ------------
