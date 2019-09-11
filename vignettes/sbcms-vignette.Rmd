@@ -45,12 +45,12 @@ Execute following commands from the R terminal.
 
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
-install.packages("devtools")
 install.packages("ggplot2")
 install.packages("gridExtra")
 
-devtools::install_github("computational-metabolomics/pmp")
-devtools::install_github("computational-metabolomics/sbcms")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("sbcms")
 ```
 
 Load the required libraries into the R environment
