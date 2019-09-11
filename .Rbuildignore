@@ -6,8 +6,6 @@
 LICENSE
 .travis.yml
 sbc.Rproj
-tutorial.Rmd
-tutorial.md
 test_data
 tutorial_files\*
 README.rst
@@ -16,3 +14,5 @@ html_docs\*
 html_docs
 ^binder/
 ^notebooks/
+binder
+notebooks
