@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 
 R package sbcms (Signal & Batch Correction for Mass Spectrometry) is an 
 implementation of Quality Control-Robust Spline Correction (QC-RSC)
-[@Kirwan2013] algorithm for signal drift and batch effect correction
+[@kirwan2013] algorithm for signal drift and batch effect correction
 within/across a multi-batch direct infusion mass spectrometry (DIMS) and
 liquid chromatography mass spectrometry (LCMS) datasets.
 
