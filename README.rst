@@ -16,21 +16,23 @@ Github
 
 .. code-block:: r
 
-  install.packages("devtools", repos="https://www.stats.bris.ac.uk/R/")
-  install.packages("ggplot2", repos="https://www.stats.bris.ac.uk/R/")
-  install.packages("gridExtra", repos="https://www.stats.bris.ac.uk/R/")
-  install.packages("reshape2", repos="https://www.stats.bris.ac.uk/R/")
-  library(devtools)
-  devtools::install_github("computational-metabolomics/pmp/tree/v0.2.2")
-  install_github('computational-metabolomics/sbcms')
+  install.packages("devtools")
+  install.packages("ggplot2")
+  install.packages("gridExtra")
+  install.packages("reshape2")
+ 
+  devtools::install_github("computational-metabolomics/pmp", build_vignettes=TRUE)
+  devtools::install_github('computational-metabolomics/sbcms', 
+    build_vignettes=TRUE)
 
 Conda
 ------------
 
 .. code-block:: command
 
-   conda create -n sbcms sbcms -c conda-forge -c bioconda -c computational-metabolomics
-   source activate sbcms
+   conda create -n sbcms bioconductor-sbcms -c conda-forge -c bioconda 
+    -c computational-metabolomics
+  source activate sbcms
 
 
 ------------
@@ -45,7 +47,8 @@ Example
   library(sbcms)
   library(pmp)
   
-  # DIMS data set is included in 'sbcms' package, (MTBLS79) [https://www.ebi.ac.uk/metabolights/MTBLS79]
+  # DIMS data set is included in 'sbcms' package
+  # (MTBLS79) [https://www.ebi.ac.uk/metabolights/MTBLS79]
   data <- sbcdata$data
   class <- sbcdata$class
   batch <- sbcdata$batch
@@ -54,8 +57,8 @@ Example
   # Input data frame or matrix should have features in rows and samples in columns
   data <- t(data)
 
-  corrected_data <- sbcms::QCRSC(df=data, order=sample_order, batch=batch, classes=class,
-    spar=0, minQC=4)
+  corrected_data <- sbcms::QCRSC(df=data, order=sample_order, batch=batch, 
+    classes=class, spar=0, minQC=4)
 
   # Create PDF file comparing data before and after correction fo the first 100 features
   sbcms::plot_sbc(df=data, corrected_df=corrected_data, classes=class,
@@ -66,8 +69,8 @@ Example
   library(ggplot2)
   library(gridExtra)
   
-  manual_color=c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3", "#a6cee3", "#778899",
-    "#fb9a99", "#ffff33")
+  manual_color=c("#386cb0", "#ef3b2c", "#7fc97f", "#fdb462", "#984ea3", 
+    "#a6cee3", "#778899", "#fb9a99", "#ffff33")
   
   # PQN used to normalise data
   # KNN for missing value imputation
@@ -131,10 +134,12 @@ Example
 Tutorials
 ------------
 
-You should have R above 3.4.2 and Rstudio installed to be able to run this tutorial notebook.
+For step by step tutorial on how to assess and/or correct signal drift and batch 
+effects within/across a multi-batch liquid chromatography mass
+spectrometry (LCMS) dataset using SBCMS please check R package vignettes.
 
-`Step by step tutorial <tutorial.md>`_ on how to assess and/or correct signal drift and batch effects within/across a multi-batch liquid chromatography mass spectrometry (LCMS) dataset using SBCMS.
-
+.. code-block:: r
+  browseVignettes("sbcms")
 
 ------------
 References
