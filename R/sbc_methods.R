@@ -9,6 +9,7 @@ NULL
 ##' @param inverse To apply log or reverse back to original values.
 ##' 
 ##' @return vector of log transformed values
+##' @noRd
 
 logFit <- function (x, a=1, inverse=FALSE) {
     if (inverse) {
@@ -30,11 +31,10 @@ logFit <- function (x, a=1, inverse=FALSE) {
 ##' @param spar Smoothing parameter of the fitted curve. Should be in the range
 ##'0 to 1. If set to 0 it will be estimated using leave-one-out
 ##'cross-validation.
-##' @param verbose If set to TRUE will return messages from smooth.spline 
-##'fit funtion
 ##' @return vector of cubic smoothing spline fitted values
+##' @noRd
 
-splineSmoother <- function(x, y, newX, log=log, a=1, spar, verbose=FALSE) {
+splineSmoother <- function(x, y, newX, log=log, a=1, spar) {
     if(log == TRUE) {
         y <- logFit(y, a=a)
     }
@@ -51,10 +51,6 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar, verbose=FALSE) {
 
     if(log==TRUE) {
         valuePredict$y <- logFit(valuePredict$y, a=a, inverse=TRUE)
-    }
-    
-    if (verbose){
-        message(paste(smoothSplineMessages, collapse= " || "))
     }
     
     return(valuePredict$y)
@@ -77,22 +73,30 @@ splineSmoother <- function(x, y, newX, log=log, a=1, spar, verbose=FALSE) {
 ##' @param order A numeric vector indicating the order in which samples
 ##'were measured.
 ##' @return vector of corrected values of selected feature for QC data
+##' @noRd
 
 sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
     batch=batch, minQC) {
     
     out <- tryCatch ({
-    # Measurment order can be non consecutive numbers as well
-    maxOrder <- length(order)
-    newOrder <- seq_len(maxOrder)
+
+    # qc data for feature
     subData <- qcData[id, ]
+    
+    # unique batches
     nbatch <- unique(qcBatch)
 
-    outl <- matrix(nrow=maxOrder, ncol=length(nbatch))
+    # preallocate output
+    outl <- numeric(length(order))
 
+    # for each batch
     for (nb in seq_len(length(nbatch))) {
+        # get the injection order for the QCs
         x <- qcOrder[qcBatch == nbatch[nb]]
+        # get the response for the QCs
         y <- subData[qcBatch == nbatch[nb]]
+        
+        # remove any index with NA in the response
         NAhits <- which(is.na(y))
 
         if (length(NAhits) > 0) {
@@ -100,21 +104,18 @@ sbcWrapper <- function(id, qcData, order, qcBatch, qcOrder, log=log, spar=spar,
             y <- y[-c(NAhits)]
         }
 
+        # if we have enough QCs values
         if (length(y) >= minQC) {
-            outl[,nb] <- splineSmoother(x=x, y=y, newX=newOrder, log=log,
+            # fit spline to QCs and get predictions for all samples in batch
+            outl[batch==nbatch[nb]] <- splineSmoother(x=x, y=y, newX=order[batch==nbatch[nb]], log=log,
             a=1, spar=spar)
         } else {
-            outl[,nb] <- rep(NA, maxOrder)
+            # otherwise replace with NA
+            outl[batch==nbatch[nb]] = NA
         }
     }
 
-    outp <- rep(NA, nrow(outl))
-    for (nb in seq_len(length(nbatch))) {
-        range <- c(batch == nbatch[nb])
-        outp[range] <- outl[range, nb]
-    }
-
-    outp
+    outp=outl
     },
 
     error = function(e){
