@@ -1,7 +1,7 @@
 Package: sbcms
 Type: Package
 Title: Signal batch correction for (LC)-MS data
-Version: 0.99.1
+Version: 0.99.2
 Author: Andris Jankevics
 Maintainer: Andris Jankevics <a.jankevics@bham.ac.uk>
 Description: This signal batch correction package for LC-MS data. This version supports missing vallues in your data (at least 4 data point for QC are needed) and has moduler desing to add different fitting/correction functions.
